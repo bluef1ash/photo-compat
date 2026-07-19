@@ -26,6 +26,13 @@ const variantStyle: Record<Variant, React.CSSProperties> = {
   destructive: { background: "transparent", color: "var(--error)", borderColor: "var(--error)", height: 40 },
 };
 
+// 尺寸样式(§6.1:standard 40px / large 48px / compact 32px)
+const sizeStyle: Record<Size, React.CSSProperties> = {
+  standard: {},
+  large: { height: 48, padding: "0 24px" },
+  compact: { height: 32, padding: "0 12px" },
+};
+
 export const Button: React.FC<ButtonProps> = ({
   variant = "secondary",
   size = "standard",
@@ -34,7 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...rest
 }) => (
   <button
-    style={{ ...base, ...variantStyle[variant], ...(size === "large" ? { height: 48, padding: "0 24px" } : {}), ...style }}
+    style={{ ...base, ...variantStyle[variant], ...sizeStyle[size], ...style }}
     {...rest}
   >
     {children}
