@@ -8,6 +8,14 @@ use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::Arc;
 use std::time::Duration;
 
+// 编译期验证 AppHandle 线程安全（Tauri 2 AppHandle: Send+Sync，par_iter 并发 emit 安全）
+const _: () = {
+    fn _assert_send_sync<T: Send + Sync>() {}
+    fn _check() {
+        _assert_send_sync::<tauri::AppHandle>();
+    }
+};
+
 // 内部实现函数，使用泛型来避免依赖 Tauri 类型
 fn run_pipeline_internal<E>(
     files: Vec<PathBuf>,
@@ -69,6 +77,7 @@ where
                 current: input.to_string_lossy().to_string(),
                 state: "running".into(),
             };
+            // AppHandle: Send+Sync，emit 内部线程安全，可在 rayon par_iter 并发调用
             emit_fn(emitter, &evt);
         }
     });

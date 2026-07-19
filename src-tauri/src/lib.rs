@@ -24,11 +24,18 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             // 日志
-            let log_dir = app.path().app_data_dir().unwrap().join("logs");
+            let log_dir = app
+                .path()
+                .app_data_dir()
+                .expect("无法获取 app_data_dir 目录")
+                .join("logs");
             let _guard = log::init(log_dir);
             app.manage(_guard); // 保活
             // 配置
-            let cfg_dir = app.path().app_data_dir().unwrap();
+            let cfg_dir = app
+                .path()
+                .app_data_dir()
+                .expect("无法获取 app_data_dir 目录");
             let config = Config::load(&cfg_dir);
             app.manage(AppState::new(config));
             Ok(())
