@@ -32,7 +32,13 @@ pub fn scan_directory(root: &Path) -> AppResult<ScanResult> {
     let mut unsupported: Vec<String> = Vec::new();
     let mut total: u32 = 0;
 
-    for entry in WalkDir::new(root).into_iter().filter_map(|e| e.ok()) {
+    for entry in WalkDir::new(root).into_iter().filter_map(|e| match e {
+        Ok(entry) => Some(entry),
+        Err(err) => {
+            tracing::warn!("扫描跳过不可访问的路径: {}", err);
+            None
+        }
+    }) {
         if !entry.file_type().is_file() {
             continue;
         }
