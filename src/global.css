@@ -1,0 +1,44 @@
+/* src/global.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--bg);
+  /* 禁用用户选择文本(桌面应用感) */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 等宽数字对齐(§12.3,统计数字) */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* 可见焦点环(§11.1,2px 强调色 + offset,不依赖颜色) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
