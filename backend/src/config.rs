@@ -19,6 +19,7 @@ pub struct Config {
     pub overwrite: bool,
     pub keep_structure: bool,
     // 性能(§10.13)
+    /// MVP:后端并行由 rayon 默认控制,此字段当前未生效;精确并行数控制是后续增量。
     pub parallel: usize,
 }
 

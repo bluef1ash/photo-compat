@@ -3,6 +3,16 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
+/// 处理进度状态（强类型枚举，杜绝后端拼写错导致前端运行时不匹配）
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ProgressState {
+    Running,
+    Paused,
+    Done,
+    Cancelled,
+}
+
 /// 扫描结果(给前端扫描结果页 §5.3)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScanResult {
@@ -22,7 +32,7 @@ pub struct ProgressEvent {
     pub failed: u32,
     pub skipped: u32,
     pub current: String,
-    pub state: String, // "running" | "paused" | "done" | "cancelled"
+    pub state: ProgressState,
 }
 
 /// 处理结果摘要(§10.12)

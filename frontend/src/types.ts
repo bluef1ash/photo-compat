@@ -1,4 +1,5 @@
 // src/types.ts
+/** 对应后端 ScanResult。后端 `files` 字段（#[serde(skip)]）不序列化到前端,故此处无此字段。 */
 export interface ScanResult {
   total: number;
   by_format: Record<string, number>;

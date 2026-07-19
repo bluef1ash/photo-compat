@@ -1,7 +1,7 @@
 // src-tauri/src/pipeline/worker.rs
 use crate::config::Config;
 use crate::pipeline::convert::{convert_file, resolve_output_path};
-use crate::types::{ProcessSummary, ProgressEvent};
+use crate::types::{ProcessSummary, ProgressEvent, ProgressState};
 use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -75,7 +75,7 @@ where
                 failed: failed.load(Ordering::Relaxed),
                 skipped: skipped.load(Ordering::Relaxed),
                 current: input.to_string_lossy().to_string(),
-                state: "running".into(),
+                state: ProgressState::Running,
             };
             // AppHandle: Send+Sync，emit 内部线程安全，可在 rayon par_iter 并发调用
             emit_fn(emitter, &evt);
@@ -85,14 +85,18 @@ where
     let cancelled = cancel.load(Ordering::Relaxed);
 
     if let Some(emitter) = emitter {
-        let final_state = if cancelled { "cancelled" } else { "done" };
+        let final_state = if cancelled {
+            ProgressState::Cancelled
+        } else {
+            ProgressState::Done
+        };
         let evt = ProgressEvent {
             done: done.load(Ordering::Relaxed),
             total,
             failed: failed.load(Ordering::Relaxed),
             skipped: skipped.load(Ordering::Relaxed),
             current: String::new(),
-            state: final_state.into(),
+            state: final_state,
         };
         emit_fn(emitter, &evt);
     }
