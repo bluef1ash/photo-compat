@@ -2,7 +2,7 @@
 use crate::error::AppResult;
 use crate::types::ScanResult;
 use std::collections::BTreeMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
 /// 支持的输入格式(§支持格式)。HEIC 识别但 MVP 不转换。
@@ -31,6 +31,7 @@ pub fn scan_directory(root: &Path) -> AppResult<ScanResult> {
     let mut by_format: BTreeMap<String, u32> = BTreeMap::new();
     let mut unsupported: Vec<String> = Vec::new();
     let mut total: u32 = 0;
+    let mut files: Vec<PathBuf> = Vec::new(); // 收集文件路径供 worker 使用
 
     for entry in WalkDir::new(root).into_iter().filter_map(|e| match e {
         Ok(entry) => Some(entry),
@@ -51,6 +52,7 @@ pub fn scan_directory(root: &Path) -> AppResult<ScanResult> {
             Some(fmt) => {
                 *by_format.entry(fmt.to_string()).or_insert(0) += 1;
                 total += 1;
+                files.push(path.to_path_buf()); // 收集文件路径
             }
             None => {
                 // 跳过无扩展名与常见非图片;有扩展名但不在支持列表则记为 unsupported
@@ -66,6 +68,7 @@ pub fn scan_directory(root: &Path) -> AppResult<ScanResult> {
         by_format,
         unsupported,
         source_dir: root.to_string_lossy().to_string(),
+        files,
     })
 }
 
