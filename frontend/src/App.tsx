@@ -4,6 +4,11 @@ import { TitleBar } from "./components/TitleBar";
 import { StatusBar } from "./components/StatusBar";
 import { Stepper } from "./components/Stepper";
 import { useAppStore } from "./store/appStore";
+import { HomeView } from "./views/HomeView";
+import { ScanningView } from "./views/ScanningView";
+import { ResultView } from "./views/ResultView";
+import { ProcessingView } from "./views/ProcessingView";
+import { CompletedView } from "./views/CompletedView";
 
 const App: React.FC = () => {
   const view = useAppStore((s) => s.view);
@@ -13,8 +18,11 @@ const App: React.FC = () => {
       <TitleBar />
       {view !== "home" && <Stepper />}
       <main style={{ flex: 1, overflow: "auto", padding: "var(--sp-l)" }}>
-        {/* 任务 12 替换为真实 views */}
-        <div style={{ padding: "var(--sp-l)" }}>当前视图: {view} (任务 12 实现具体内容)</div>
+        {view === "home" && <HomeView />}
+        {view === "scanning" && <ScanningView />}
+        {view === "result" && <ResultView />}
+        {view === "processing" && <ProcessingView />}
+        {view === "completed" && <CompletedView />}
       </main>
       <StatusBar />
     </div>
