@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { open } from "@tauri-apps/plugin-dialog";
+import { join } from "@tauri-apps/api/path";
 import * as cmd from "../ipc/commands";
 import type {
   Config,
@@ -23,6 +24,7 @@ const DEFAULT_CONFIG: Config = {
   subfolder: "compat",
   overwrite: false,
   keep_structure: true,
+  // MVP:前端默认值仅 UI 参考;后端并行由 rayon 默认控制,精确 parallel 生效是增量
   parallel: 4,
 };
 
@@ -78,6 +80,10 @@ export const useAppStore = create<State>((set, get) => ({
   startProcess: async () => {
     const scan = get().scan;
     if (!scan) return;
+    // 先清理旧监听器，防止重复 startProcess 累积监听器
+    const old = get().unlisten;
+    if (old) old();
+
     set({ view: "processing", progress: null, summary: null, paused: false });
     // 订阅进度与完成事件
     const un1 = await listen<ProgressEvent>("process://progress", (e) => {
@@ -94,7 +100,8 @@ export const useAppStore = create<State>((set, get) => ({
     try {
       await cmd.startProcess(scan.source_dir, get().config);
     } catch (e) {
-      set({ error: String(e) });
+      // 失败回首页 + 错误,防卡 processing
+      set({ error: String(e), view: "home" });
     }
   },
 
@@ -112,7 +119,8 @@ export const useAppStore = create<State>((set, get) => ({
   openOutput: async () => {
     const scan = get().scan;
     if (!scan) return;
-    const outDir = scan.source_dir.replace(/[\\/]+$/, "") + "/" + get().config.subfolder;
+    // 用 Tauri path API 替代字符串拼接，跨平台兼容
+    const outDir = await join(scan.source_dir, get().config.subfolder);
     await cmd.openOutput(outDir);
   },
 

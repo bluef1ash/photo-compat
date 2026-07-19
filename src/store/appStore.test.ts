@@ -10,6 +10,21 @@ vi.mock("../ipc/commands", () => ({
   openOutput: vi.fn(),
 }));
 
+// mock Tauri dialog API
+vi.mock("@tauri-apps/plugin-dialog", () => ({
+  open: vi.fn(),
+}));
+
+// mock Tauri event API
+vi.mock("@tauri-apps/api/event", () => ({
+  listen: vi.fn(() => Promise.resolve(() => {})),
+}));
+
+// mock Tauri path API
+vi.mock("@tauri-apps/api/path", () => ({
+  join: vi.fn(async (a: string, b: string) => `${a}/${b}`),
+}));
+
 describe("appStore 状态机", () => {
   beforeEach(async () => {
     const { useAppStore } = await import("./appStore");
@@ -29,5 +44,27 @@ describe("appStore 状态机", () => {
     s.reset();
     expect(useAppStore.getState().view).toBe("home");
     expect(useAppStore.getState().error).toBeNull();
+  });
+
+  it("空目录回 home 且显示错误（§15.1）", async () => {
+    const { useAppStore } = await import("./appStore");
+    const { scanDirectory } = await import("../ipc/commands");
+    const { open } = await import("@tauri-apps/plugin-dialog");
+
+    // mock dialog 返回路径
+    (open as any).mockResolvedValue("/test/path");
+    // mock scanDirectory 返回空结果
+    (scanDirectory as any).mockResolvedValue({
+      total: 0,
+      by_format: {},
+      unsupported: [],
+      source_dir: "/test/path",
+    });
+
+    await useAppStore.getState().selectFolder();
+
+    expect(useAppStore.getState().view).toBe("home");
+    expect(useAppStore.getState().error).not.toBeNull();
+    expect(useAppStore.getState().error).toContain("没有可处理的照片");
   });
 });
