@@ -2,6 +2,9 @@ pub mod error;
 #[allow(dead_code)]
 pub mod log;
 pub mod config;
+pub mod types;
+pub mod pipeline;
+pub mod commands;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -14,7 +17,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, commands::scan_directory_cmd])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
