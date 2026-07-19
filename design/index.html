@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>照片适配助手 · 交互原型</title>
+<link rel="stylesheet" href="assets/styles.css">
+<!-- 补充：步骤条已完成态切换数字 ↔ 对勾（styles.css 之上的微调） -->
+<style>
+  .step .step-check{display:none}
+  .step.done .step-num > *:not(.step-check){display:none}
+  .step.done .step-check{display:inline-flex;align-items:center;justify-content:center;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- ============ 图标 sprite ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-folder-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v1H6z"/><path d="M3 9h17l-2.5 8.5a2 2 0 0 1-1.9 1.5H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M21.5 12h-3M5.5 12h-3M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1M18.4 18.4l-2.1-2.1M7.7 7.7L5.6 5.6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 14l4-4"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-.5-.3-.9-.6-1.2-.3-.4-.6-.7-.6-1.3 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7" r="1"/><circle cx="15.5" cy="8" r="1"/></symbol>
+  <symbol id="i-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5a3.5 3.5 0 0 1 4 4L9 19l-4 1 1-4z"/><path d="M13 7l4 4"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4"/></symbol>
+  <symbol id="i-tune" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M8 13h8M8 17h6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></symbol>
+  <symbol id="i-check-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 13h6l-2 8 8-10h-6z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+</svg>
+
+<div class="desktop">
+<div class="window" id="window">
+
+  <!-- ============ 标题栏 ============ -->
+  <header class="titlebar">
+    <div class="tb-left">
+      <div class="tb-logo">📁</div>
+      <span class="tb-appname">照片适配助手</span>
+    </div>
+    <div class="tb-right">
+      <span class="mode-badge" id="modeBadge">标准兼容模式</span>
+      <button class="icon-btn" id="menuBtn" title="菜单" aria-label="菜单">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+      </button>
+      <div class="sys-btns">
+        <button class="sys-btn min" title="最小化" aria-label="最小化"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button>
+        <button class="sys-btn max" title="最大化" aria-label="最大化"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button>
+        <button class="sys-btn close" title="关闭" aria-label="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 步骤条 ============ -->
+  <nav class="stepper" id="stepper">
+    <div class="step current" data-step="1">
+      <div class="step-num"><span>1</span><svg class="step-check"><use href="#i-check-s"/></svg></div>
+      <div class="step-label">选目录</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="2">
+      <div class="step-num"><span>2</span><svg class="step-check"><use href="#i-check-s"/></svg></div>
+      <div class="step-label">查看结果</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="3">
+      <div class="step-num"><span>3</span><svg class="step-check"><use href="#i-check-s"/></svg></div>
+      <div class="step-label">处理</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="4">
+      <div class="step-num"><span>4</span><svg class="step-check"><use href="#i-check-s"/></svg></div>
+      <div class="step-label">完成</div>
+    </div>
+  </nav>
+
+  <!-- ============ 主内容区 ============ -->
+  <main class="main" id="main">
+
+    <!-- ----- 首页 ----- -->
+    <section class="view active" data-view="home">
+      <div class="home-hero">
+        <h1 class="home-title">把照片变成任何老旧系统都能上传的格式</h1>
+        <p class="home-subtitle">全程离线，不上传任何文件，安全放心</p>
+      </div>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="拖入文件夹或选择文件夹">
+        <div class="dz-icon"><svg><use href="#i-folder"/></svg></div>
+        <div class="dz-text">把包含照片的文件夹拖到这里</div>
+        <div class="dz-or">— 或 —</div>
+        <button class="btn btn-primary btn-large" id="btnSelect">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h3.5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          选择文件夹
+        </button>
+        <div class="dz-hint">支持 JPEG / PNG / HEIC / WebP / GIF / TIFF · 自动转换为高兼容 JPEG</div>
+      </div>
+
+      <div class="recent">
+        <div class="recent-head"><h3>最近文件夹</h3></div>
+        <div class="recent-item">
+          <div class="ri-icon"><svg><use href="#i-folder"/></svg></div>
+          <div class="ri-info">
+            <div class="ri-path">E:\照片\2026民政采集</div>
+            <div class="ri-meta">上次处理：3 天前 · 230 张 · 标准兼容模式</div>
+          </div>
+          <button class="btn btn-secondary btn-compact">继续</button>
+        </div>
+        <div class="recent-item">
+          <div class="ri-icon"><svg><use href="#i-folder"/></svg></div>
+          <div class="ri-info">
+            <div class="ri-path">D:\医院HIS\住院登记照片</div>
+            <div class="ri-meta">上次处理：1 周前 · 88 张 · 医院系统模式</div>
+          </div>
+          <button class="btn btn-secondary btn-compact">继续</button>
+        </div>
+        <div class="recent-item">
+          <div class="ri-icon"><svg><use href="#i-folder"/></svg></div>
+          <div class="ri-info">
+            <div class="ri-path">C:\Users\办公\学籍采集</div>
+            <div class="ri-meta">上次处理：2 周前 · 412 张 · 标准兼容模式</div>
+          </div>
+          <button class="btn btn-secondary btn-compact">继续</button>
+        </div>
+      </div>
+
+      <div class="infobar info compact">
+        <svg class="ib-icon"><use href="#i-info"/></svg>
+        <div class="ib-content">
+          <div class="ib-title">会做什么</div>
+          <div class="ib-desc">转成 JPEG · 去除拍摄信息（EXIF）· 修正方向 · 去除颜色配置（ICC）· 转为基础式 JPEG · 转换 HEIC · 限制 4096px</div>
+        </div>
+        <button class="btn btn-subtle btn-compact" onclick="openSettings();switchGroup('compat')">查看 / 修改</button>
+      </div>
+    </section>
+
+    <!-- ----- 扫描中 ----- -->
+    <section class="view" data-view="scanning">
+      <div class="scanning">
+        <div class="spinner lg"></div>
+        <div class="scan-text">正在扫描文件夹…</div>
+        <div class="scan-found">已发现 <b id="scanFound">0</b><span style="font-size:13px;color:var(--fg-disabled)"> 张图片</span></div>
+        <div class="mono" style="font-size:12px;color:var(--fg-muted);max-width:560px;word-break:break-all;text-align:center" id="scanFolder"></div>
+      </div>
+    </section>
+
+    <!-- ----- 扫描结果 ----- -->
+    <section class="view" data-view="result">
+      <div class="result-head">
+        <div>
+          <div class="result-title">扫描完成</div>
+          <div class="result-path" id="resPath"></div>
+        </div>
+        <span class="resel" id="reselLink">← 重新选择</span>
+      </div>
+
+      <div class="stat-grid cols-4 mb4">
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-image"/></svg><div class="stat-num" id="resTotal">0</div><div class="stat-label">总图片数</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-export"/></svg><div class="stat-num" id="resOut">0</div><div class="stat-label">预计输出数量</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-folder"/></svg><div class="stat-num small" id="resSize">—</div><div class="stat-label">预计输出大小</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-bolt"/></svg><div class="stat-num small" id="resSave">—</div><div class="stat-label">预计节省</div></div>
+      </div>
+
+      <div class="block-label">格式分布</div>
+      <div class="card format-card mb4">
+        <div class="fmt-grid">
+          <div class="fmt-item" id="fmt-jpg"><div class="fmt-top"><span class="fmt-name">JPEG <span class="badge ok">无需转换</span></span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          <div class="fmt-item" id="fmt-png"><div class="fmt-top"><span class="fmt-name">PNG <span class="badge convert">将转换</span></span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          <div class="fmt-item" id="fmt-heic"><div class="fmt-top"><span class="fmt-name">HEIC <span class="badge convert">将转换</span></span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          <div class="fmt-item" id="fmt-webp"><div class="fmt-top"><span class="fmt-name">WebP <span class="badge convert">将转换</span></span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          <div class="fmt-item" id="fmt-gif"><div class="fmt-top"><span class="fmt-name">GIF</span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          <div class="fmt-item" id="fmt-tiff"><div class="fmt-top"><span class="fmt-name">TIFF <span class="badge convert">将转换</span></span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          <div class="fmt-item" style="opacity:.5"><div class="fmt-top"><span class="fmt-name">BMP</span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+        </div>
+      </div>
+
+      <div class="block-label">兼容性问题与警告</div>
+      <div class="warn-list mb4">
+        <div class="infobar warn">
+          <svg class="ib-icon"><use href="#i-warn"/></svg>
+          <div class="ib-content"><div class="ib-title">检测到 8 张 HEIC（iPhone 照片）</div><div class="ib-desc">几乎所有老旧系统都不支持 HEIC，将自动转换为 JPEG。</div></div>
+        </div>
+        <div class="infobar warn" id="unsupportedBar" style="cursor:pointer">
+          <svg class="ib-icon"><use href="#i-warn"/></svg>
+          <div class="ib-content"><div class="ib-title">检测到 3 个暂不支持的文件 <span class="badge warn">点击查看</span></div><div class="ib-desc">PSD 设计源文件 ×2、RAW 相机原始文件 ×1，将跳过（可点击查看清单）。</div></div>
+        </div>
+        <div class="infobar err">
+          <svg class="ib-icon"><use href="#i-warn"/></svg>
+          <div class="ib-content"><div class="ib-title">3 张图片疑似损坏</div><div class="ib-desc">将被跳过并记录到日志，不影响其余文件处理。</div></div>
+        </div>
+      </div>
+
+      <div class="card mb4">
+        <div class="output-summary">
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> 输出到 <b>同目录 / compat 文件夹</b></span>
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> <b>保留</b>文件夹结构</span>
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> <b>不覆盖</b>已存在文件</span>
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> JPEG 质量 <b>90</b></span>
+          <span class="os-modify" id="outModify">修改</span>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div class="ab-info">共 <b id="abTotal">230</b> 张，预计输出约 48 MB</div>
+        <button class="btn btn-secondary" id="btnResultCancel">取消</button>
+        <button class="btn btn-primary" id="btnStart">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg>
+          开始处理
+        </button>
+      </div>
+    </section>
+
+    <!-- ----- 处理中 ----- -->
+    <section class="view" data-view="processing">
+      <div class="proc-hero">
+        <div class="proc-pct" id="procPct">0%</div>
+        <div class="progress proc-bar"><div class="progress-fill" id="procFill"></div></div>
+        <div class="proc-count" id="procCount">已处理 <b>0</b> / 230</div>
+        <div class="current-file">
+          <div class="cf-thumb"><svg><use href="#i-image"/></svg></div>
+          <div class="cf-name" id="cfName">准备中…</div>
+          <span class="badge accent" id="cfOp">—</span>
+        </div>
+      </div>
+
+      <div class="stat-grid cols-6">
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-clock"/></svg><div class="stat-num small" id="stElapsed">00:00</div><div class="stat-label">已用时间</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-clock"/></svg><div class="stat-num small" id="stRemain">--:--</div><div class="stat-label">预计剩余</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-bolt"/></svg><div class="stat-num small" id="stSpeed">0.0</div><div class="stat-label">速度（张/秒）</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-check-s"/></svg><div class="stat-num small" id="stDone">0</div><div class="stat-label">已处理</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-warn"/></svg><div class="stat-num small" id="stFail">0</div><div class="stat-label">失败</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-flag"/></svg><div class="stat-num small" id="stSkip">0</div><div class="stat-label">跳过（点击查看）</div></div>
+      </div>
+
+      <div class="log-panel" id="logPanel">
+        <div class="log-head" id="logToggle">
+          <h4><svg><use href="#i-list"/></svg> 实时日志</h4>
+          <span class="log-toggle">展开</span>
+        </div>
+        <div class="log-list" id="logList"></div>
+      </div>
+
+      <div class="action-bar">
+        <div class="ab-info">标准兼容模式 · 质量 90 · 去除 EXIF/ICC</div>
+        <button class="btn btn-subtle" id="btnOpenLog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/></svg>
+          打开日志文件
+        </button>
+        <button class="btn btn-destructive" id="btnCancel">取消</button>
+        <button class="btn btn-secondary" id="btnPause">
+          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>
+          暂停
+        </button>
+      </div>
+    </section>
+
+    <!-- ----- 完成 ----- -->
+    <section class="view" data-view="completed">
+      <div class="completed-hero" id="cmpHero">
+        <div class="cmp-check"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10" pathLength="100"/></svg></div>
+        <div class="cmp-title" id="cmpTitle">处理完成！</div>
+        <div class="cmp-sub" id="cmpSub">227 张照片已转换为兼容格式</div>
+      </div>
+
+      <div class="stat-grid cols-4 mb4">
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-image"/></svg><div class="stat-num" id="cmpTotal">230</div><div class="stat-label">总计处理</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-check-s"/></svg><div class="stat-num" id="cmpOk" style="color:var(--success)">227</div><div class="stat-label">成功</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-warn"/></svg><div class="stat-num small" id="cmpFail">0</div><div class="stat-label">失败</div></div>
+        <div class="stat-card"><svg class="stat-icon"><use href="#i-flag"/></svg><div class="stat-num small" id="cmpSkip" style="color:var(--fg-muted)">3</div><div class="stat-label">跳过（损坏）</div></div>
+      </div>
+
+      <div class="card summary-card mb4">
+        <div class="section-title" style="margin-bottom:12px">已应用的兼容设置</div>
+        <div class="sc-row"><span class="k">兼容模式</span><span class="v">标准兼容模式</span></div>
+        <div class="sc-row"><span class="k">JPEG 质量</span><span class="v">90</span></div>
+        <div class="sc-row"><span class="k">已执行</span><span class="v">去除 EXIF · 去除 ICC · 修正方向 · 转 Baseline · 转换 HEIC · 限制 4096px</span></div>
+      </div>
+
+      <div class="card output-card mb4">
+        <div class="section-title" style="margin-bottom:8px">输出位置</div>
+        <div class="out-path" id="outPath">E:\照片\2026民政采集\compat</div>
+        <div class="out-structure"><svg><use href="#i-check-s"/></svg> 已保留原文件夹结构 · 共 227 个文件 · 约 48 MB</div>
+      </div>
+
+      <div class="action-bar">
+        <div class="ab-info">处理用时 01:12 · 平均 3.1 张/秒</div>
+        <button class="btn btn-subtle" id="btnExport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4"/></svg>
+          导出日志
+        </button>
+        <button class="btn btn-secondary" id="btnAnother">处理另一个文件夹</button>
+        <button class="btn btn-primary btn-large" id="btnOpenOut">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l4-4h4v4H7v6h4l-4 4-4-4z" transform="rotate(-90 9 12) translate(3 -3)"/><path d="M5 11h14M14 8l4 4-4 4"/></svg>
+          打开输出目录
+        </button>
+      </div>
+    </section>
+
+    <!-- ----- 设置 ----- -->
+    <section class="view" data-view="settings">
+      <div class="settings">
+        <aside class="settings-side">
+          <div class="settings-back" id="settingsBack"><svg><use href="#i-back"/></svg> 返回</div>
+          <div class="settings-search">
+            <svg><use href="#i-search"/></svg>
+            <input type="text" placeholder="搜索设置项" aria-label="搜索设置项">
+          </div>
+          <div class="nav-item active" data-group="general"><svg><use href="#i-tune"/></svg> 通用</div>
+          <div class="nav-item" data-group="output"><svg><use href="#i-export"/></svg> 输出</div>
+          <div class="nav-item" data-group="compat"><svg><use href="#i-shield"/></svg> 兼容性</div>
+          <div class="nav-item" data-group="perf"><svg><use href="#i-gauge"/></svg> 性能</div>
+          <div class="nav-item" data-group="appearance"><svg><use href="#i-palette"/></svg> 外观</div>
+          <div class="nav-item" data-group="advanced"><svg><use href="#i-tool"/></svg> 高级</div>
+        </aside>
+
+        <div class="settings-content">
+
+          <!-- 通用 -->
+          <div class="setting-group active" data-group="general">
+            <div class="sg-title">通用</div>
+            <div class="sg-desc">基础偏好设置，影响应用整体行为。</div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">界面语言</div><div class="sr-desc">应用界面显示的语言。</div></div><div class="sr-right"><select class="select"><option>简体中文</option><option>English</option></select></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">启动时恢复上次文件夹</div><div class="sr-desc">打开应用时自动进入上次处理的目录。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">处理完成提示音</div><div class="sr-desc">全部处理完成后播放一声提示音。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">关闭窗口时</div><div class="sr-desc">点击关闭按钮时的行为。</div></div><div class="sr-right"><div class="seg"><button class="active">退出</button><button>最小化到托盘</button></div></div></div>
+          </div>
+
+          <!-- 输出 -->
+          <div class="setting-group" data-group="output">
+            <div class="sg-title">输出</div>
+            <div class="sg-desc">控制处理结果的保存位置与命名方式。默认安全：写入子目录、不覆盖原文件。</div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">输出位置</div><div class="sr-desc">结果保存到哪里。</div></div><div class="sr-right"><div class="seg"><button class="active">同目录子文件夹</button><button>指定目录</button></div></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">子文件夹名</div><div class="sr-desc">输出子目录的名称。</div></div><div class="sr-right"><input class="numberbox" style="width:130px;text-align:left" value="compat"></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">保留文件夹结构</div><div class="sr-desc">输出时镜像原目录树；关闭则全部平铺到一个文件夹（同名自动加序号）。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">覆盖已存在文件</div><div class="sr-desc">开启则同名文件直接覆盖（危险）；关闭则跳过或加序号。</div><div class="sr-hint warn">谨慎：开启可能覆盖原始结果</div></div><div class="sr-right"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div></div>
+          </div>
+
+          <!-- 兼容性 -->
+          <div class="setting-group" data-group="compat">
+            <div class="sg-title">兼容性</div>
+            <div class="sg-desc">核心设置。默认值已为 95% 场景优化，通常无需修改。</div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">移除拍摄信息（EXIF）</div><div class="sr-desc">删除相机型号、拍摄时间、GPS 定位等隐藏信息。老系统常因这部分过大导致上传失败。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">移除颜色配置（ICC）</div><div class="sr-desc">删除颜色管理信息。部分老系统不识别 ICC 会报错。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">自动修正方向</div><div class="sr-desc">根据拍摄方向把照片摆正，避免 iPhone 照片在老系统里横倒显示。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">转为基础式 JPEG（Baseline）</div><div class="sr-desc">把渐进式 JPEG 转成基础式，解决老系统只显示半张图的问题。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">转换 HEIC</div><div class="sr-desc">把 iPhone 默认的 HEIC 格式转成 JPEG。几乎所有老系统都不支持 HEIC。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">转为 sRGB 色彩空间</div><div class="sr-desc">统一为兼容性最好的色彩空间，避免老系统色彩错乱。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">JPEG 质量</div><div class="sr-desc">0–100，越高越清晰、文件越大。90 兼顾画质与兼容。</div><div class="sr-hint">推荐 90 · 低于 75 可能肉眼可见模糊</div></div><div class="sr-right"><div class="slider"><input type="range" min="60" max="100" value="90"></div><span class="slider-val">90</span></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">最大宽度</div><div class="sr-desc">超宽图按此值缩小。老系统常拒绝超大图。</div></div><div class="sr-right"><input class="numberbox" type="number" value="4096"> px</div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">最大高度</div><div class="sr-desc">同上。</div></div><div class="sr-right"><input class="numberbox" type="number" value="4096"> px</div></div>
+          </div>
+
+          <!-- 性能（含架构自适应演示） -->
+          <div class="setting-group" data-group="perf">
+            <div class="sg-title">性能</div>
+            <div class="sg-desc">处理速度与资源占用。并行数与内存上限会按 CPU 架构自动调整。</div>
+
+            <div class="setting-row">
+              <div class="sr-left"><div class="sr-title">模拟 CPU 架构 <span class="badge accent">演示</span></div><div class="sr-desc">切换以查看架构自适应默认值的变化（真实环境由程序自动检测）。</div></div>
+              <div class="sr-right"><div class="seg" id="archSeg"><button class="active" data-arch="x86">x86_64</button><button data-arch="loongarch">龙芯 LoongArch</button><button data-arch="arm">ARM 鲲鹏/飞腾</button></div></div>
+            </div>
+
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">并行处理数</div><div class="sr-desc">同时处理的图片数量。越多越快，但占内存越大。</div></div><div class="sr-right"><input class="numberbox" type="number" id="parallelNum" value="8"></div></div>
+
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">大图采样缩放</div><div class="sr-desc" id="bigImgHint">超大图先采样再处理，省内存。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" id="bigImgToggle" checked><span class="toggle-slider"></span></label></div></div>
+
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">处理优先级</div><div class="sr-desc">"低"时后台处理不卡前台其他程序。</div></div><div class="sr-right"><div class="seg"><button class="active">正常</button><button>低</button></div></div></div>
+
+            <div class="arch-note">
+              <svg><use href="#i-info"/></svg>
+              <div><div id="archNoteText">检测到 x86_64 架构，已按 CPU 核心数设为并行 8（可调）。</div>
+              <div style="margin-top:4px;font-size:11px;color:var(--fg-muted)">国产 CPU（龙芯/飞腾/鲲鹏）性能档位偏低，默认更保守以避免卡顿与内存溢出。</div></div>
+            </div>
+          </div>
+
+          <!-- 外观（含托盘开关演示） -->
+          <div class="setting-group" data-group="appearance">
+            <div class="sg-title">外观</div>
+            <div class="sg-desc">主题、颜色与窗口装饰。</div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">主题</div><div class="sr-desc">界面明暗模式。</div></div><div class="sr-right"><div class="seg"><button class="active">跟随系统</button><button>浅色</button><button>深色</button></div></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">强调色</div><div class="sr-desc">按钮与链接的主色调。</div></div><div class="sr-right"><div class="seg"><button class="active">系统蓝</button><button>墨绿</button><button>紫</button></div></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">字号</div><div class="sr-desc">大字号适合视力不佳用户。</div></div><div class="sr-right"><div class="seg"><button class="active">标准</button><button>大</button><button>超大</button></div></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">窗口标题栏</div><div class="sr-desc">应用自绘标题栏在三端一致；可切换为系统原生装饰。</div><div class="sr-hint">Linux 桌面可选系统原生（CSD/SSD）</div></div><div class="sr-right"><div class="seg"><button class="active">应用自绘</button><button>系统原生</button></div></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">最小化到托盘</div><div class="sr-desc">关闭窗口时驻留系统托盘，可继续后台处理。</div><div class="sr-hint warn">无托盘环境（如纯 GNOME）将自动隐藏此项</div></div><div class="sr-right"><label class="toggle"><input type="checkbox" id="trayToggle"><span class="toggle-slider"></span></label></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">减少动画</div><div class="sr-desc">关闭过渡动画。跟随系统辅助设置。</div></div><div class="sr-right"><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div></div>
+          </div>
+
+          <!-- 高级 -->
+          <div class="setting-group" data-group="advanced">
+            <div class="sg-title">高级</div>
+            <div class="sg-desc">日志、临时目录与配置管理。普通用户无需调整。</div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">日志级别</div><div class="sr-desc">详细日志便于排查，但文件更大。</div></div><div class="sr-right"><select class="select"><option>常规</option><option>详细</option></select></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">日志保留天数</div><div class="sr-desc">超期日志自动清理。</div></div><div class="sr-right"><input class="numberbox" type="number" value="30"> 天</div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">临时目录</div><div class="sr-desc">处理中转目录，建议留足空间。</div></div><div class="sr-right"><input class="numberbox" style="width:200px;text-align:left;font-size:12px" value="C:\Users\Temp"></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">导出 / 导入配置</div><div class="sr-desc">便于备份或在多台电脑间统一部署。</div></div><div class="sr-right"><button class="btn btn-secondary btn-compact">导出</button><button class="btn btn-secondary btn-compact">导入</button></div></div>
+            <div class="setting-row"><div class="sr-left"><div class="sr-title">重置所有设置</div><div class="sr-desc">恢复为默认值。</div><div class="sr-hint warn">将清除自定义配置，需二次确认</div></div><div class="sr-right"><button class="btn btn-destructive btn-compact">重置</button></div></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ 状态栏 ============ -->
+  <footer class="statusbar">
+    <div class="sb-left"><span class="sb-dot" id="sbDot"></span><span id="sbStatus">就绪</span></div>
+    <div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div>
+    <div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span id="sbVer">v1.0</span></div>
+  </footer>
+
+</div>
+</div>
+
+<!-- ============ 标题栏菜单 ============ -->
+<div class="menu-flyout" id="menuFlyout">
+  <div class="menu-item" data-menu="settings"><svg><use href="#i-settings"/></svg> 设置 <span class="mi-key">Ctrl+,</span></div>
+  <div class="menu-item" data-menu="log"><svg><use href="#i-doc"/></svg> 打开日志文件 <span class="mi-key">Ctrl+L</span></div>
+  <div class="menu-sep"></div>
+  <div class="menu-item" data-menu="about"><svg><use href="#i-info"/></svg> 关于照片适配助手 <span class="mi-key">F1</span></div>
+  <div class="menu-sep"></div>
+  <div class="menu-item" data-menu="errDir"><svg><use href="#i-warn"/></svg> 演示：目录不可访问</div>
+  <div class="menu-item" data-menu="errPerm"><svg><use href="#i-warn"/></svg> 演示：权限不足</div>
+  <div class="menu-item" data-menu="errDisk"><svg><use href="#i-warn"/></svg> 演示：磁盘已满</div>
+</div>
+
+<!-- ============ 模态层 ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- ============ Toast 层 ============ -->
+<div class="toast-root" id="toastRoot"></div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
