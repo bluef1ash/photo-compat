@@ -1,6 +1,10 @@
 import React from "react";
+
 export const ProgressBar: React.FC<{ value: number }> = ({ value }) => (
-  <div style={{ height: 8, background: "var(--border)", borderRadius: "var(--radius-sm)", overflow: "hidden" }}>
-    <div style={{ width: `${Math.min(100, Math.max(0, value))}%`, height: "100%", background: "var(--accent)", transition: "width 150ms ease" }} />
+  <div className="h-2 bg-border rounded-sm overflow-hidden">
+    <div
+      className="h-full bg-accent transition-[width] duration-150 ease-out w-[var(--progress)]"
+      style={{ "--progress": `${Math.min(100, Math.max(0, value))}%` } as React.CSSProperties}
+    />
   </div>
 );
