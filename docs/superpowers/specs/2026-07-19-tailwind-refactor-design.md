@@ -95,14 +95,14 @@
 
 ## global 精简(并入 tokens.less,删除 global.less)
 
-| 原 global.less 内容 | 处理 |
-|---|---|
-| `@import "tailwindcss"` | 移到 tokens.less 顶部 |
-| `*,:before,:after { box-sizing }` / `html,body,#root` 重置 | 删,Tailwind preflight 接管 |
+| 原 global.less 内容                                           | 处理                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `@import "tailwindcss"`                                       | 移到 tokens.less 顶部                                                                                    |
+| `*,:before,:after { box-sizing }` / `html,body,#root` 重置    | 删,Tailwind preflight 接管                                                                               |
 | `body { font-family/font-size/color/background/user-select }` | `@layer base { body { @apply font-ui text-body text-fg bg-bg select-none; } }`(全局 body,避免每组件重复) |
-| `.tnum` | 删类,组件用 `tabular-nums font-mono` |
-| `:focus-visible` | 移到 tokens.less `@layer base` |
-| `button { font-family/cursor }` `button:disabled` | Tailwind preflight 接管 + 组件类 |
+| `.tnum`                                                       | 删类,组件用 `tabular-nums font-mono`                                                                     |
+| `:focus-visible`                                              | 移到 tokens.less `@layer base`                                                                           |
+| `button { font-family/cursor }` `button:disabled`             | Tailwind preflight 接管 + 组件类                                                                         |
 
 `main.tsx` 改单 `import "./tokens.less"`(删 global.less import)。
 
