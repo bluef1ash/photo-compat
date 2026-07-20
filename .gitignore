@@ -39,3 +39,5 @@ dist/
 
 # Tauri 生成
 backend/gen/
+
+*.code-workspace
