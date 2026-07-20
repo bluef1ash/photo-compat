@@ -20,6 +20,7 @@ export const DropZone: React.FC = () => {
 
   return (
     <div
+      className={`border-2 ${hover ? "border-solid border-accent bg-accent-soft" : "border-dashed border-accent bg-surface-alt"} rounded-lg p-12 text-center flex flex-col items-center gap-4 outline-none`}
       onDragOver={(e) => { e.preventDefault(); setHover(true); }}
       onDragLeave={() => setHover(false)}
       onDrop={onDrop}
@@ -27,21 +28,10 @@ export const DropZone: React.FC = () => {
       tabIndex={0}
       aria-label="拖入文件夹或选择文件夹"
       onKeyDown={(e) => { if (e.key === "Enter") selectFolder(); }}
-      style={{
-        border: `2px ${hover ? "solid" : "dashed"} var(--accent)`,
-        borderRadius: "var(--radius-md)",
-        background: hover ? "var(--accent-soft)" : "var(--surface-alt)",
-        padding: "var(--sp-xxl)",
-        textAlign: "center",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "var(--sp-m)",
-      }}
     >
       <Icon name="folder" size={48} />
       <div>把包含照片的文件夹拖到这里</div>
-      <div style={{ color: "var(--fg-muted)" }}>— 或 —</div>
+      <div className="text-fg-muted">— 或 —</div>
       <Button variant="primary" size="large" onClick={selectFolder}>
         <Icon name="folder" /> 选择文件夹
       </Button>
