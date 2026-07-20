@@ -22,21 +22,21 @@ export const ProcessingView: React.FC = () => {
   const pct = progress && progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-l)", maxWidth: 900, margin: "0 auto" }}>
+    <div className="flex flex-col gap-6 max-w-4xl mx-auto">
       <div>
-        <div className="tnum" style={{ fontSize: 48, fontWeight: 600 }}>{pct}%</div>
+        <div className="tabular-nums font-mono text-display-num-lg font-semibold">{pct}%</div>
         <ProgressBar value={pct} />
-        <div style={{ color: "var(--fg-muted)", marginTop: "var(--sp-xs)" }}>
+        <div className="text-fg-muted mt-2">
           已处理 {progress?.done ?? 0} / {progress?.total ?? 0}
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sp-m)" }}>
+      <div className="grid grid-cols-4 gap-4">
         <StatCard value={progress?.done ?? 0} label="已处理" />
         <StatCard value={progress?.failed ?? 0} label="失败" tone={(progress?.failed ?? 0) > 0 ? "error" : "default"} />
         <StatCard value={progress?.skipped ?? 0} label="跳过" tone="muted" />
         <StatCard value={paused ? "已暂停" : "运行中"} label="状态" />
       </div>
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--sp-s)" }}>
+      <div className="flex justify-end gap-3">
         <Button variant="destructive" onClick={cancel}>取消</Button>
         <Button variant="secondary" onClick={togglePause}>{paused ? "继续" : "暂停"}</Button>
       </div>
