@@ -1,45 +1,96 @@
 @import "tailwindcss";
-/* src/global.css */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+
+@theme inline {
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-accent-soft: var(--accent-soft);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-disabled: var(--fg-disabled);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-divider: var(--divider);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-error: var(--error);
+  --color-error-soft: var(--error-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --text-caption: 12px;
+  --text-body: 14px;
+  --text-subtitle: 20px;
+  --text-title: 28px;
+  --shadow-rest: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
+  --font-ui: "Segoe UI Variable Text", "Segoe UI", "Cantarell", "Inter", system-ui, "Microsoft YaHei UI", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", sans-serif;
+  --font-mono: "Cascadia Code", "Consolas", "JetBrains Mono", "DejaVu Sans Mono", ui-monospace, monospace;
 }
 
-html,
-body,
-#root {
-  margin: 0;
-  height: 100%;
+:root {
+  --accent: #0067c0;
+  --accent-hover: #005293;
+  --accent-pressed: #003f73;
+  --accent-disabled: #8ab8e8;
+  --accent-soft: #e5f1fb;
+  --bg: #f3f3f3;
+  --surface: #ffffff;
+  --surface-alt: #fafafa;
+  --fg: #1a1a1a;
+  --fg-muted: #5b5b5b;
+  --fg-disabled: #8a8a8a;
+  --border: #e5e5e5;
+  --border-strong: #d1d1d1;
+  --divider: #ededed;
+  --success: #107c10;
+  --success-soft: #dff6dd;
+  --warning: #9d5d00;
+  --warning-soft: #fff4ce;
+  --error: #c42b1c;
+  --error-soft: #fde7e9;
+  --info: #0067c0;
+  --info-soft: #e5f1fb;
 }
 
-body {
-  font-family: var(--font-ui);
-  font-size: var(--fs-body);
-  line-height: 1.5;
-  color: var(--fg);
-  background: var(--bg);
-  /* 禁用用户选择文本(桌面应用感) */
-  -webkit-user-select: none;
-  user-select: none;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent: #4cc2ff;
+    --accent-hover: #62b6ff;
+    --accent-pressed: #7bd1ff;
+    --accent-disabled: #3a5c7a;
+    --accent-soft: #0a2b45;
+    --bg: #202020;
+    --surface: #2b2b2b;
+    --surface-alt: #323232;
+    --fg: #ffffff;
+    --fg-muted: #c5c5c5;
+    --fg-disabled: #7a7a7a;
+    --border: #3f3f3f;
+    --border-strong: #565656;
+    --divider: #383838;
+  }
 }
 
-/* 等宽数字对齐(§12.3,统计数字) */
-.tnum {
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
-}
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
 
-/* 可见焦点环(§11.1,2px 强调色 + offset,不依赖颜色) */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+  body {
+    @apply font-ui text-body text-fg bg-bg select-none;
+  }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-button:disabled {
-  cursor: not-allowed;
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
