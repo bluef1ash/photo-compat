@@ -13,15 +13,15 @@ src/
 ├── icons/        内联 SVG sprite(Icons.tsx)
 ├── types.ts      与后端 backend/src/types.rs + config.rs 对齐的共享类型
 ├── App.tsx       框架(标题栏/步骤条/状态栏)+ 视图路由
-├── main.tsx      入口(import "./global.less")
-├── global.less   唯一样式入口
+├── main.tsx      入口(import "./global.css")
+├── global.css    唯一样式入口(Tailwind v4 纯 CSS;**禁用 LESS**——less 预处理破坏 @tailwindcss/vite 的 utilities 生成)
 └── test-setup.ts
 ```
 
 ## 样式规则(用户决策,硬约束)
 
-- **尽可能使用 Tailwind**;**禁止内联 style(样式属性)**;尽量不用 LESS/CSS(动画和特殊情况除外)
-- **唯一样式入口**:`src/global.less`(`@import "tailwindcss"` + `@theme inline` + `:root`/`@media` 运行时主题 + `@layer base` body/焦点环)。**不再新增 .less/.css 文件**
+- **尽可能使用 Tailwind**;**禁止内联 style(样式属性)**;样式入口用**纯 CSS**(**禁用 LESS**——less 预处理会破坏 @tailwindcss/vite 的 utilities JIT 生成与 @apply 展开,已实测:global.less 产物缺整个 utilities 层、@apply 残留未展开;global.css 产物正常)
+- **唯一样式入口**:`src/global.css`(`@import "tailwindcss"` + `@theme inline` + `:root`/`@media` 运行时主题 + `@layer base` body/焦点环)。**不再新增 .less/.css 文件**
 - 令牌:用 Tailwind 令牌类 `bg-accent`/`text-fg`/`text-fg-muted`/`p-4`/`rounded-md`/`text-body`/`shadow-rest`/`font-ui` 等。颜色类自动跟随 Light/Dark 运行时主题
 - 间距:Tailwind 默认 spacing(4px 栅格,`p-1`=4 / `p-2`=8 / `p-3`=12 / `p-4`=16 / `p-6`=24 / `p-8`=32 / `p-12`=48),禁游离值
 - **动态值**:CSS 变量 + 任意值类——`style={{ "--progress": \`${pct}%\` } as React.CSSProperties}` + `className="w-[var(--progress)]"`。**严禁样式属性**(`style={{ width/color/... }}`)
