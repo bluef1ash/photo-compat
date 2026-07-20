@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.photocompat.app",
   "build": {
-    "beforeDevCommand": "pnpm --dir ../frontend run dev",
+    "beforeDevCommand": "pnpm --dir ./frontend run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm --dir ../frontend run build",
+    "beforeBuildCommand": "pnpm --dir ./frontend run build",
     "frontendDist": "../frontend/dist"
   },
   "app": {
