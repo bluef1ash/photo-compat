@@ -12,7 +12,7 @@ const symbols = [
 ] as const;
 
 export const IconSprite: React.FC = () => (
-  <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+  <svg width="0" height="0" className='absolute' aria-hidden="true">
     {symbols.map(([id, d]) => (
       <symbol key={id} id={`i-${id}`} viewBox="0 0 24 24" fill="none"
         stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

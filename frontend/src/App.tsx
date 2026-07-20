@@ -13,11 +13,11 @@ import { CompletedView } from "./views/CompletedView";
 const App: React.FC = () => {
   const view = useAppStore((s) => s.view);
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <div className='h-full flex flex-col'>
       <IconSprite />
       <TitleBar />
       {view !== "home" && <Stepper />}
-      <main style={{ flex: 1, overflow: "auto", padding: "var(--sp-l)" }}>
+      <main className='flex-1 overflow-auto p-6'>
         {view === "home" && <HomeView />}
         {view === "scanning" && <ScanningView />}
         {view === "result" && <ResultView />}
