@@ -7,7 +7,7 @@ export const StatCard: React.FC<{
 }> = ({ value, label, tone = "default" }) => (
   <div className="bg-surface border border-border rounded-md p-4">
     <div
-      className={`tabular-nums font-mono text-3xl font-semibold ${
+      className={`tabular-nums font-mono text-display-num font-semibold ${
         tone === "error"
           ? "text-error"
           : tone === "muted"
