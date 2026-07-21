@@ -1,40 +1,63 @@
-import React, { useCallback } from "react";
-import { Icon } from "../icons/Icons";
-import { Button } from "./Button";
-import { useAppStore } from "../store/appStore";
+import Folder from '@mui/icons-material/Folder'
+import { Box } from '@mui/material'
+import React, { useCallback } from 'react'
+import { useAppStore } from '../store/appStore'
+import { Button } from './Button'
 
 export const DropZone: React.FC = () => {
-  const selectFolder = useAppStore((s) => s.selectFolder);
-  const [hover, setHover] = React.useState(false);
+  const selectFolder = useAppStore((s) => s.selectFolder)
+  const [hover, setHover] = React.useState(false)
 
+  // MVP:拖拽仅视觉反馈,统一走系统选择器入口。完整拖拽路径处理留增量
   const onDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-      setHover(false);
-      // MVP:拖拽到文件夹选择走同一入口(系统选择器);拖拽仅作视觉反馈。
-      // 完整拖拽路径处理(直接取 dropped 文件夹路径)在后续增量。
-      await selectFolder();
+    async (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      setHover(false)
+      await selectFolder()
     },
-    [selectFolder]
-  );
+    [selectFolder],
+  )
 
   return (
-    <div
-      className={`border-2 ${hover ? "border-solid border-accent bg-accent-soft" : "border-dashed border-accent bg-surface-alt"} rounded-lg p-12 text-center flex flex-col items-center gap-4 outline-none`}
-      onDragOver={(e) => { e.preventDefault(); setHover(true); }}
-      onDragLeave={() => setHover(false)}
-      onDrop={onDrop}
+    <Box
       role="button"
       tabIndex={0}
       aria-label="拖入文件夹或选择文件夹"
-      onKeyDown={(e) => { if (e.key === "Enter") selectFolder(); }}
+      onDragOver={(e) => {
+        e.preventDefault()
+        setHover(true)
+      }}
+      onDragLeave={() => setHover(false)}
+      onDrop={onDrop}
+      onClick={selectFolder}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          selectFolder()
+        }
+      }}
+      sx={{
+        border: '2px',
+        borderStyle: hover ? 'solid' : 'dashed',
+        borderColor: 'var(--mui-palette-primary-main)',
+        bgcolor: hover ? 'var(--accent-soft)' : 'var(--surface-alt)',
+        borderRadius: 2,
+        p: 6,
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 2,
+        outline: 'none',
+        cursor: 'pointer',
+      }}
     >
-      <Icon name="folder" size={48} />
-      <div>把包含照片的文件夹拖到这里</div>
-      <div className="text-fg-muted">— 或 —</div>
-      <Button variant="primary" size="large" onClick={selectFolder}>
-        <Icon name="folder" /> 选择文件夹
+      <Folder sx={{ fontSize: 48 }} />
+      <Box>把包含照片的文件夹拖到这里</Box>
+      <Box sx={{ color: 'var(--mui-palette-text-secondary)' }}>— 或 —</Box>
+      {/* 内层 Button 不绑 onClick:点击冒泡到外层 Box 的 selectFolder,避免双触发 */}
+      <Button variant="primary" size="large">
+        <Folder /> 选择文件夹
       </Button>
-    </div>
-  );
-};
+    </Box>
+  )
+}
