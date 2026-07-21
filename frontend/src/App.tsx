@@ -1,29 +1,135 @@
 import { Box } from '@mui/material'
-import type React from 'react'
+import { useEffect } from 'react'
+import { ActionBar } from './components/ActionBar'
+import { MenuFlyout } from './components/MenuFlyout'
+import { ModalHost } from './components/ModalHost'
 import { StatusBar } from './components/StatusBar'
 import { Stepper } from './components/Stepper'
 import { TitleBar } from './components/TitleBar'
+import { ToastHost } from './components/ToastHost'
 import { useAppStore } from './store/appStore'
 import { CompletedView } from './views/Completed'
 import { HomeView } from './views/Home'
 import { ProcessingView } from './views/Processing'
 import { ResultView } from './views/Result'
 import { ScanningView } from './views/Scanning'
+import { SettingsView } from './views/Settings'
 
-const App: React.FC = () => {
+const App = () => {
   const view = useAppStore((s) => s.view)
+
+  // 启动加载后端配置
+  useEffect(() => {
+    void useAppStore.getState().loadSettings()
+  }, [])
+
+  // 全局键盘快捷键（Esc/Ctrl+,/Ctrl+O/Ctrl+L/F1/Space/Enter）
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const s = useAppStore.getState()
+
+      if (e.key === 'Escape') {
+        if (s.modal) {
+          s.closeModal()
+        } else if (s.menuOpen) {
+          s.toggleMenu(false)
+        } else if (s.view === 'settings') {
+          s.closeSettings()
+        } else if (s.view === 'result') {
+          s.reset()
+        } else if (s.view === 'processing') {
+          void s.cancel()
+        }
+        return
+      }
+
+      if (e.ctrlKey && e.key === ',') {
+        e.preventDefault()
+        if (s.view === 'settings') {
+          s.closeSettings()
+        } else {
+          s.openSettings()
+        }
+        return
+      }
+
+      if (e.ctrlKey && (e.key === 'o' || e.key === 'O')) {
+        e.preventDefault()
+        if (s.view === 'completed') {
+          void s.openOutput()
+        } else {
+          void s.selectFolder()
+        }
+        return
+      }
+
+      if (e.ctrlKey && (e.key === 'l' || e.key === 'L')) {
+        e.preventDefault()
+        void s.openLog()
+        return
+      }
+
+      if (e.key === 'F1') {
+        e.preventDefault()
+        s.openModal('about')
+        return
+      }
+
+      if (e.key === ' ' && s.view === 'processing') {
+        e.preventDefault()
+        void s.togglePause()
+        return
+      }
+
+      if (e.key === 'Enter') {
+        if (s.view === 'home' || s.view === 'scanning') {
+          e.preventDefault()
+          void s.selectFolder()
+        } else if (s.view === 'result') {
+          e.preventDefault()
+          void s.startProcess()
+        } else if (s.view === 'completed') {
+          e.preventDefault()
+          void s.openOutput()
+        }
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  const flush = view === 'settings' || view === 'scanning'
+
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <TitleBar />
-      {view !== 'home' && <Stepper />}
-      <Box component="main" sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-        {view === 'home' && <HomeView />}
-        {view === 'scanning' && <ScanningView />}
-        {view === 'result' && <ResultView />}
-        {view === 'processing' && <ProcessingView />}
-        {view === 'completed' && <CompletedView />}
+      {view !== 'settings' ? <Stepper /> : null}
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          position: 'relative',
+          bgcolor: 'var(--mui-palette-background-default)',
+          p: flush ? 0 : '32px',
+        }}
+      >
+        {view === 'home' ? <HomeView /> : null}
+        {view === 'scanning' ? <ScanningView /> : null}
+        {view === 'result' ? <ResultView /> : null}
+        {view === 'processing' ? <ProcessingView /> : null}
+        {view === 'completed' ? <CompletedView /> : null}
+        {view === 'settings' ? (
+          <Box sx={{ height: '100%' }}>
+            <SettingsView />
+          </Box>
+        ) : null}
       </Box>
+      <ActionBar />
       <StatusBar />
+      <MenuFlyout />
+      <ModalHost />
+      <ToastHost />
     </Box>
   )
 }
