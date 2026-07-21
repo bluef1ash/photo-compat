@@ -10,7 +10,7 @@
     "tauri": "tauri",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "pnpm run biome:lint && pnpm run tsc",
+    "lint": "biome lint && tsc",
     "lint:fix": "biome lint --write --unsafe",
     "format": "biome format --write",
     "check": "biome check",
