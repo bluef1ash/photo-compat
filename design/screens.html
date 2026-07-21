@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1180, initial-scale=1">
+<title>照片适配助手 · 屏幕总览（选择文件夹之后）</title>
+<link rel="stylesheet" href="assets/styles.css">
+<!-- 总览页覆盖样式：所有屏静态展开，窗口高度自适应，不缩放 -->
+<style>
+  body{ display:block; overflow:auto; padding:32px 0; }
+  .screen-card{ width:1100px; margin:0 auto 36px; border-radius:10px; overflow:hidden; box-shadow:var(--sh-window); background:var(--bg); }
+  .screen-tag{ background:#0a1a2a; color:#cfe4f7; padding:9px 18px; font-size:12px; font-weight:600; letter-spacing:.02em; }
+  .screen-tag b{ color:#4cc2ff; }
+  .screen-tag .idx{ display:inline-block; width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;background:var(--accent);color:#fff;margin-right:8px;font-size:12px; }
+  .screen-card .window{ width:100%; height:auto; min-height:auto; transform:none; border-radius:0; box-shadow:none; }
+  .screen-card .view{ display:block !important; padding:24px 32px 32px; height:auto; }
+  .screen-card .main{ overflow:visible; flex:1; }
+  .screen-card .stepper{ padding:0 48px; }
+</style>
+</head>
+<body>
+
+<!-- 图标 sprite（总览页用到的图标） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+</svg>
+
+<!-- ============ 共用片段（标题栏 / 步骤条 / 状态栏 重复内联） ============ -->
+
+<!-- ───────── 屏 ② 扫描中 ───────── -->
+<div class="screen-card">
+  <div class="screen-tag"><span class="idx">2</span><b>扫描中</b> · 选定文件夹后，正在扫描图片</div>
+  <div class="window">
+    <header class="titlebar">
+      <div class="tb-left"><div class="tb-logo">📁</div><span class="tb-appname">照片适配助手</span></div>
+      <div class="tb-right"><span class="mode-badge">标准兼容模式</span>
+        <div class="sys-btns"><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button><button class="sys-btn close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+      </div>
+    </header>
+    <nav class="stepper">
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">选目录</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step current"><div class="step-num">2</div><div class="step-label">扫描中</div></div>
+      <div class="step-line"></div><div class="step"><div class="step-num">3</div><div class="step-label">处理</div></div>
+      <div class="step-line"></div><div class="step"><div class="step-num">4</div><div class="step-label">完成</div></div>
+    </nav>
+    <main class="main">
+      <section class="view" data-view="scanning">
+        <div class="scanning">
+          <div class="spinner lg"></div>
+          <div class="scan-text">正在扫描文件夹…</div>
+          <div class="scan-found">已发现 <b>233</b><span style="font-size:13px;color:var(--fg-disabled)"> 张图片</span></div>
+          <div class="mono" style="font-size:12px;color:var(--fg-muted);max-width:560px;word-break:break-all;text-align:center">E:\照片\2026民政采集</div>
+        </div>
+      </section>
+    </main>
+    <footer class="statusbar"><div class="sb-left"><span class="sb-dot running"></span><span>扫描中</span></div><div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div><div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span>v1.0</span></div></footer>
+  </div>
+</div>
+
+<!-- ───────── 屏 ③ 扫描结果 ───────── -->
+<div class="screen-card">
+  <div class="screen-tag"><span class="idx">3</span><b>扫描结果</b> · 扫描完成，确认后开始处理（确定性原则关键页）</div>
+  <div class="window">
+    <header class="titlebar">
+      <div class="tb-left"><div class="tb-logo">📁</div><span class="tb-appname">照片适配助手</span></div>
+      <div class="tb-right"><span class="mode-badge">标准兼容模式</span>
+        <div class="sys-btns"><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button><button class="sys-btn close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+      </div>
+    </header>
+    <nav class="stepper">
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">选目录</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step current"><div class="step-num">2</div><div class="step-label">查看结果</div></div>
+      <div class="step-line"></div><div class="step"><div class="step-num">3</div><div class="step-label">处理</div></div>
+      <div class="step-line"></div><div class="step"><div class="step-num">4</div><div class="step-label">完成</div></div>
+    </nav>
+    <main class="main">
+      <section class="view" data-view="result">
+        <div class="result-head">
+          <div><div class="result-title">扫描完成</div><div class="result-path">E:\照片\2026民政采集</div></div>
+          <span class="resel">← 重新选择</span>
+        </div>
+        <div class="stat-grid cols-4 mb4">
+          <div class="stat-card"><div class="stat-num">230</div><div class="stat-label">总图片数</div></div>
+          <div class="stat-card"><div class="stat-num">230</div><div class="stat-label">预计输出数量</div></div>
+          <div class="stat-card"><div class="stat-num small">约 48 <span class="stat-unit">MB</span></div><div class="stat-label">预计输出大小</div></div>
+          <div class="stat-card"><div class="stat-num small">减少 12 <span class="stat-unit">MB</span></div><div class="stat-label">预计节省</div></div>
+        </div>
+        <div class="block-label">格式分布</div>
+        <div class="card format-card mb4">
+          <div class="fmt-grid">
+            <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">JPEG <span class="badge ok">无需转换</span></span><span class="fmt-count">201</span></div><div class="fmt-bar"><i style="width:87%"></i></div></div>
+            <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">PNG <span class="badge convert">将转换</span></span><span class="fmt-count">15</span></div><div class="fmt-bar"><i style="width:6.5%"></i></div></div>
+            <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">HEIC <span class="badge convert">将转换</span></span><span class="fmt-count">8</span></div><div class="fmt-bar"><i style="width:3.5%"></i></div></div>
+            <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">WebP <span class="badge convert">将转换</span></span><span class="fmt-count">3</span></div><div class="fmt-bar"><i style="width:1.3%"></i></div></div>
+            <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">GIF</span><span class="fmt-count">2</span></div><div class="fmt-bar"><i style="width:0.9%"></i></div></div>
+            <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">TIFF <span class="badge convert">将转换</span></span><span class="fmt-count">1</span></div><div class="fmt-bar"><i style="width:0.4%"></i></div></div>
+            <div class="fmt-item" style="opacity:.5"><div class="fmt-top"><span class="fmt-name">BMP</span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+          </div>
+        </div>
+        <div class="block-label">图片文件列表</div>
+        <div class="card mb4" style="padding:16px 18px">
+          <div class="file-list-head"><h3>共 230 张图片</h3><span class="fl-count">显示前 12 张<a class="fl-link">查看全部</a></span></div>
+          <div class="file-list-body">
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-id.jpg" alt=""><div class="file-info"><div class="file-name">IMG_2026_0142.HEIC</div><div class="file-meta">4032×3024 · 2.4 MB</div></div><span class="badge convert">HEIC</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-cert.jpg" alt=""><div class="file-info"><div class="file-name">身份证_正面.jpg</div><div class="file-meta">1024×768 · 856 KB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">户口本_首页.png</div><div class="file-meta">2480×3508 · 1.8 MB</div></div><span class="badge convert">PNG</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-scene.jpg" alt=""><div class="file-info"><div class="file-name">现场照片_001.jpg</div><div class="file-meta">4032×3024 · 3.1 MB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-id.jpg" alt=""><div class="file-info"><div class="file-name">IMG_2026_0143.HEIC</div><div class="file-meta">4032×3024 · 2.6 MB</div></div><span class="badge convert">HEIC</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-cert.jpg" alt=""><div class="file-info"><div class="file-name">资格证明.webp</div><div class="file-meta">1600×1200 · 620 KB</div></div><span class="badge convert">WebP</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">户口本_本人页.png</div><div class="file-meta">2480×3508 · 1.9 MB</div></div><span class="badge convert">PNG</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">申请表_扫描.jpg</div><div class="file-meta">2000×2800 · 1.2 MB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-id.jpg" alt=""><div class="file-info"><div class="file-name">IMG_2026_0144.HEIC</div><div class="file-meta">4032×3024 · 2.5 MB</div></div><span class="badge convert">HEIC</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">老档案_001.tiff</div><div class="file-meta">3200×2400 · 5.4 MB</div></div><span class="badge convert">TIFF</span><span class="badge accent">转 JPEG</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-scene.jpg" alt=""><div class="file-info"><div class="file-name">现场照片_002.jpg</div><div class="file-meta">4032×3024 · 2.8 MB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+            <div class="file-item"><img class="file-thumb" src="assets/thumb-cert.jpg" alt=""><div class="file-info"><div class="file-name">证件_背面.jpg</div><div class="file-meta">1024×768 · 780 KB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+          </div>
+        </div>
+
+        <div class="block-label">兼容性问题与警告</div>
+        <div class="mb4">
+          <div class="infobar warn"><svg class="ib-icon"><use href="#i-warn"/></svg><div class="ib-content"><div class="ib-title">检测到 8 张 HEIC（iPhone 照片）</div><div class="ib-desc">几乎所有老旧系统都不支持 HEIC，将自动转换为 JPEG。</div></div></div>
+          <div class="infobar warn"><svg class="ib-icon"><use href="#i-warn"/></svg><div class="ib-content"><div class="ib-title">检测到 3 个暂不支持的文件 <span class="badge warn">点击查看</span></div><div class="ib-desc">PSD 设计源文件 ×2、RAW 相机原始文件 ×1，将跳过。</div></div></div>
+          <div class="infobar err"><svg class="ib-icon"><use href="#i-warn"/></svg><div class="ib-content"><div class="ib-title">3 张图片疑似损坏</div><div class="ib-desc">将被跳过并记录到日志，不影响其余文件处理。</div></div></div>
+        </div>
+        <div class="card mb4">
+          <div class="output-summary">
+            <span class="os-item"><svg><use href="#i-check-s"/></svg> 输出到 <b>同目录 / compat 文件夹</b></span>
+            <span class="os-item"><svg><use href="#i-check-s"/></svg> <b>保留</b>文件夹结构</span>
+            <span class="os-item"><svg><use href="#i-check-s"/></svg> <b>不覆盖</b>已存在文件</span>
+            <span class="os-item"><svg><use href="#i-check-s"/></svg> JPEG 质量 <b>90</b></span>
+            <span class="os-modify">修改</span>
+          </div>
+        </div>
+        <div class="action-bar" style="position:static;margin:24px -32px -32px">
+          <div class="ab-info">共 <b>230</b> 张，预计输出约 48 MB</div>
+          <button class="btn btn-secondary">取消</button>
+          <button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg> 开始处理</button>
+        </div>
+      </section>
+    </main>
+    <footer class="statusbar"><div class="sb-left"><span class="sb-dot"></span><span>就绪</span></div><div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div><div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span>v1.0</span></div></footer>
+  </div>
+</div>
+
+<!-- ───────── 屏 ④ 处理中 ───────── -->
+<div class="screen-card">
+  <div class="screen-tag"><span class="idx">4</span><b>处理中</b> · 实时进度、当前文件、统计与日志（快照 68%）</div>
+  <div class="window">
+    <header class="titlebar">
+      <div class="tb-left"><div class="tb-logo">📁</div><span class="tb-appname">照片适配助手</span></div>
+      <div class="tb-right"><span class="mode-badge">标准兼容模式</span>
+        <div class="sys-btns"><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button><button class="sys-btn close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+      </div>
+    </header>
+    <nav class="stepper">
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">选目录</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">查看结果</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step current"><div class="step-num">3</div><div class="step-label">处理</div></div>
+      <div class="step-line"></div><div class="step"><div class="step-num">4</div><div class="step-label">完成</div></div>
+    </nav>
+    <main class="main">
+      <section class="view" data-view="processing">
+        <div class="proc-hero">
+          <div class="proc-pct">68%</div>
+          <div class="progress proc-bar"><div class="progress-fill" style="width:68%"></div></div>
+          <div class="proc-count">已处理 <b>156</b> / 230</div>
+          <div class="current-file">
+            <div class="cf-thumb"><svg><use href="#i-image"/></svg></div>
+            <div class="cf-name">户口本_本人页.png</div>
+            <span class="badge accent">PNG → JPEG · 转换</span>
+          </div>
+        </div>
+        <div class="stat-grid cols-6">
+          <div class="stat-card"><div class="stat-num small">00:42</div><div class="stat-label">已用时间</div></div>
+          <div class="stat-card"><div class="stat-num small">01:20</div><div class="stat-label">预计剩余</div></div>
+          <div class="stat-card"><div class="stat-num small">3.7</div><div class="stat-label">速度（张/秒）</div></div>
+          <div class="stat-card"><div class="stat-num small">154</div><div class="stat-label">已处理</div></div>
+          <div class="stat-card"><div class="stat-num small">0</div><div class="stat-label">失败</div></div>
+          <div class="stat-card skip"><div class="stat-num small">2</div><div class="stat-label">跳过（点击查看）</div></div>
+        </div>
+        <div class="log-panel open">
+          <div class="log-head"><h4><svg><use href="#i-list"/></svg> 实时日志</h4><span class="log-toggle">隐藏</span></div>
+          <div class="log-list" style="display:block">
+            <div class="log-row info"><span class="log-ts">[14:22:53]</span><span class="log-msg">开始处理 230 张图片 · 标准兼容模式</span></div>
+            <div class="log-row ok"><span class="log-ts">[14:22:54]</span><span class="log-msg">转换 HEIC → JPEG：IMG_2026_0142.HEIC</span></div>
+            <div class="log-row ok"><span class="log-ts">[14:22:55]</span><span class="log-msg">去除 EXIF · 转 Baseline：身份证_正面.jpg</span></div>
+            <div class="log-row warn"><span class="log-ts">[14:22:56]</span><span class="log-msg">跳过损坏文件：现场照片_001.jpg</span></div>
+            <div class="log-row ok"><span class="log-ts">[14:22:57]</span><span class="log-msg">PNG → JPEG · 转换：户口本_首页.png</span></div>
+            <div class="log-row ok"><span class="log-ts">[14:22:58]</span><span class="log-msg">转换 HEIC → JPEG：IMG_2026_0143.HEIC</span></div>
+          </div>
+        </div>
+        <div class="action-bar" style="position:static;margin:24px -32px -32px">
+          <div class="ab-info">标准兼容模式 · 质量 90 · 去除 EXIF/ICC</div>
+          <button class="btn btn-subtle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/></svg> 打开日志文件</button>
+          <button class="btn btn-destructive">取消</button>
+          <button class="btn btn-secondary"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg> 暂停</button>
+        </div>
+      </section>
+    </main>
+    <footer class="statusbar"><div class="sb-left"><span class="sb-dot running"></span><span>处理中</span></div><div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div><div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span>v1.0</span></div></footer>
+  </div>
+</div>
+
+<!-- ───────── 屏 ⑤ 完成 ───────── -->
+<div class="screen-card">
+  <div class="screen-tag"><span class="idx">5</span><b>完成</b> · 处理结束，打开输出目录或继续</div>
+  <div class="window">
+    <header class="titlebar">
+      <div class="tb-left"><div class="tb-logo">📁</div><span class="tb-appname">照片适配助手</span></div>
+      <div class="tb-right"><span class="mode-badge">标准兼容模式</span>
+        <div class="sys-btns"><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button><button class="sys-btn close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+      </div>
+    </header>
+    <nav class="stepper">
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">选目录</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">查看结果</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">处理</div></div>
+      <div class="step-line" style="background:var(--accent)"></div>
+      <div class="step current"><div class="step-num">4</div><div class="step-label">完成</div></div>
+    </nav>
+    <main class="main">
+      <section class="view" data-view="completed">
+        <div class="completed-hero">
+          <div class="cmp-check"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10" pathLength="100" style="stroke-dashoffset:0"/></svg></div>
+          <div class="cmp-title">处理完成！</div>
+          <div class="cmp-sub">227 张照片已转换为兼容格式</div>
+        </div>
+        <div class="stat-grid cols-4 mb4">
+          <div class="stat-card"><div class="stat-num">230</div><div class="stat-label">总计处理</div></div>
+          <div class="stat-card"><div class="stat-num" style="color:var(--success)">227</div><div class="stat-label">成功</div></div>
+          <div class="stat-card"><div class="stat-num small">0</div><div class="stat-label">失败</div></div>
+          <div class="stat-card skip"><div class="stat-num small" style="color:var(--fg-muted)">3</div><div class="stat-label">跳过（损坏）</div></div>
+        </div>
+        <div class="card summary-card mb4">
+          <div class="section-title" style="margin-bottom:12px">已应用的兼容设置</div>
+          <div class="sc-row"><span class="k">兼容模式</span><span class="v">标准兼容模式</span></div>
+          <div class="sc-row"><span class="k">JPEG 质量</span><span class="v">90</span></div>
+          <div class="sc-row"><span class="k">已执行</span><span class="v">去除 EXIF · 去除 ICC · 修正方向 · 转 Baseline · 转换 HEIC · 限制 4096px</span></div>
+        </div>
+        <div class="card output-card mb4">
+          <div class="section-title" style="margin-bottom:8px">输出位置</div>
+          <div class="out-path">E:\照片\2026民政采集\compat</div>
+          <div class="out-structure"><svg><use href="#i-check-s"/></svg> 已保留原文件夹结构 · 共 227 个文件 · 约 48 MB</div>
+        </div>
+        <div class="action-bar" style="position:static;margin:24px -32px -32px">
+          <div class="ab-info">处理用时 01:12 · 平均 3.1 张/秒</div>
+          <button class="btn btn-subtle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4"/></svg> 导出日志</button>
+          <button class="btn btn-secondary">处理另一个文件夹</button>
+          <button class="btn btn-primary btn-large">打开输出目录</button>
+        </div>
+      </section>
+    </main>
+    <footer class="statusbar"><div class="sb-left"><span class="sb-dot"></span><span>处理完成</span></div><div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div><div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span>v1.0</span></div></footer>
+  </div>
+</div>
+
+</body>
+</html>

@@ -72,6 +72,7 @@ function setView(name) {
   state.prevView = (name === 'settings') ? state.view : state.prevView;
   state.view = name;
   $$('.view').forEach(v => v.classList.toggle('active', v.dataset.view === name));
+  $$('.action-bar').forEach(a => a.classList.toggle('active', a.dataset.view === name));
   // 步骤条：settings 时隐藏，否则按 view 高亮
   const stepper = $('#stepper');
   if (name === 'settings') {
@@ -140,6 +141,102 @@ function showResult() {
     if (bar) bar.style.width = (f.count / TOTAL * 100) + '%';
     if (cnt) cnt.textContent = f.count;
   });
+  renderFileList();
+}
+
+/* 图片文件列表数据（扫描结果页展示前 12 张，循环 4 张真实占位照） */
+const FILES = [
+  { name:'IMG_2026_0142.HEIC', fmt:'HEIC', size:'2.4 MB', dim:'4032×3024', status:'转 JPEG',   thumb:'assets/thumb-id.jpg' },
+  { name:'身份证_正面.jpg',    fmt:'JPEG', size:'856 KB', dim:'1024×768',  status:'去除 EXIF', thumb:'assets/thumb-cert.jpg' },
+  { name:'户口本_首页.png',    fmt:'PNG',  size:'1.8 MB', dim:'2480×3508', status:'转 JPEG',   thumb:'assets/thumb-doc.jpg' },
+  { name:'现场照片_001.jpg',   fmt:'JPEG', size:'3.1 MB', dim:'4032×3024', status:'去除 EXIF', thumb:'assets/thumb-scene.jpg' },
+  { name:'IMG_2026_0143.HEIC', fmt:'HEIC', size:'2.6 MB', dim:'4032×3024', status:'转 JPEG',   thumb:'assets/thumb-id.jpg' },
+  { name:'资格证明.webp',       fmt:'WebP', size:'620 KB', dim:'1600×1200', status:'转 JPEG',   thumb:'assets/thumb-cert.jpg' },
+  { name:'户口本_本人页.png',  fmt:'PNG',  size:'1.9 MB', dim:'2480×3508', status:'转 JPEG',   thumb:'assets/thumb-doc.jpg' },
+  { name:'申请表_扫描.jpg',    fmt:'JPEG', size:'1.2 MB', dim:'2000×2800', status:'去除 EXIF', thumb:'assets/thumb-doc.jpg' },
+  { name:'IMG_2026_0144.HEIC', fmt:'HEIC', size:'2.5 MB', dim:'4032×3024', status:'转 JPEG',   thumb:'assets/thumb-id.jpg' },
+  { name:'老档案_001.tiff',    fmt:'TIFF', size:'5.4 MB', dim:'3200×2400', status:'转 JPEG',   thumb:'assets/thumb-doc.jpg' },
+  { name:'现场照片_002.jpg',   fmt:'JPEG', size:'2.8 MB', dim:'4032×3024', status:'去除 EXIF', thumb:'assets/thumb-scene.jpg' },
+  { name:'证件_背面.jpg',      fmt:'JPEG', size:'780 KB', dim:'1024×768',  status:'去除 EXIF', thumb:'assets/thumb-cert.jpg' },
+];
+
+/* 渲染图片文件列表，点击或回车打开预览 */
+function renderFileList() {
+  const body = $('#fileListBody');
+  if (!body) return;
+  body.innerHTML = FILES.map((f, i) => `
+    <div class="file-item" data-idx="${i}" tabindex="0" role="button" aria-label="预览 ${f.name}">
+      <img class="file-thumb" src="${f.thumb}" alt="${f.name}" loading="lazy">
+      <div class="file-info">
+        <div class="file-name">${f.name}</div>
+        <div class="file-meta">${f.dim} · ${f.size}</div>
+      </div>
+      <span class="badge ${/HEIC|PNG|WebP|TIFF/.test(f.fmt) ? 'convert' : 'ok'}">${f.fmt}</span>
+      <span class="badge accent">${f.status}</span>
+    </div>`).join('');
+  body.querySelectorAll('.file-item').forEach(it => {
+    const idx = +it.dataset.idx;
+    it.addEventListener('click', () => openPreview(idx));
+    it.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPreview(idx); } });
+  });
+}
+
+/* 图片预览（复用 #modalBox / #modalOverlay），支持左右键切换 */
+let previewIdx = 0;
+function openPreview(i) {
+  previewIdx = i;
+  const f = FILES[i];
+  const willConvert = /HEIC|PNG|WebP|TIFF/.test(f.fmt);
+  $('#modalBox').innerHTML = `
+    <div class="modal preview-modal">
+      <div class="modal-head"><div class="modal-icon info">${ICON.info}</div><div class="modal-title">${f.name}</div></div>
+      <div class="modal-body">
+        <div class="preview-stage">
+          <div class="preview-nav prev" id="pvPrev" title="上一张">‹</div>
+          <img src="${f.thumb}" alt="${f.name}">
+          <div class="preview-nav next" id="pvNext" title="下一张">›</div>
+        </div>
+        <div class="preview-info">
+          <div class="pi"><div class="k">原始格式</div><div class="v">${f.fmt}${willConvert ? ' → JPEG' : ''}</div></div>
+          <div class="pi"><div class="k">尺寸</div><div class="v">${f.dim}</div></div>
+          <div class="pi"><div class="k">大小</div><div class="v">${f.size}</div></div>
+          <div class="pi"><div class="k">将执行</div><div class="v">${f.status} · 质量 90</div></div>
+          <div class="pi"><div class="k">序号</div><div class="v">${i + 1} / ${FILES.length}</div></div>
+        </div>
+      </div>
+      <div class="modal-actions"><button class="btn btn-primary" id="pvClose">关闭</button></div>
+    </div>`;
+  $('#modalOverlay').classList.add('show');
+  $('#pvPrev').addEventListener('click', () => navPreview(-1));
+  $('#pvNext').addEventListener('click', () => navPreview(1));
+  $('#pvClose').addEventListener('click', closeModal);
+}
+function navPreview(d) { openPreview((previewIdx + d + FILES.length) % FILES.length); }
+
+/* 处理中页静态快照（供预览/导出定位，不启动定时器） */
+function showProcessingStatic() {
+  setView('processing');
+  updateStatus('processing');
+  $('#procPct').textContent = '68';
+  $('#procFill').style.width = '68%';
+  $('#procCount').innerHTML = '已处理 <b>156</b> / 230';
+  $('#cfName').textContent = '户口本_本人页.png';
+  $('#cfOp').textContent = 'PNG → JPEG · 转换';
+  $('#stElapsed').textContent = '00:42';
+  $('#stRemain').textContent = '01:20';
+  $('#stSpeed').textContent = '3.7 张/秒';
+  $('#stDone').textContent = '154';
+  $('#stFail').textContent = '0';
+  $('#stSkip').textContent = '2';
+  $('#stSkip').parentElement.classList.add('skip');
+  $('#logList').innerHTML = '';
+  $('#logPanel').classList.add('open');
+  log('info', '开始处理 230 张图片 · 标准兼容模式');
+  log('ok', '转换 HEIC → JPEG：IMG_2026_0142.HEIC');
+  log('ok', '去除 EXIF · 转 Baseline：身份证_正面.jpg');
+  log('warn', '跳过损坏文件：现场照片_001.jpg');
+  log('ok', 'PNG → JPEG · 转换：户口本_首页.png');
+  log('ok', '转换 HEIC → JPEG：IMG_2026_0143.HEIC');
 }
 
 /* ============================================================
@@ -475,6 +572,12 @@ document.addEventListener('keydown', e => {
     return;
   }
 
+  // 图片预览模态：左右键切换上一张 / 下一张
+  if ($('#modalBox .preview-stage')) {
+    if (k === 'ArrowLeft') { e.preventDefault(); navPreview(-1); return; }
+    if (k === 'ArrowRight') { e.preventDefault(); navPreview(1); return; }
+  }
+
   if (e.ctrlKey || e.metaKey) {
     if (inField) return;
     if (k === 'o' || k === 'O') { e.preventDefault(); state.view === 'completed' ? openOutput() : startScan(); return; }
@@ -505,6 +608,19 @@ document.addEventListener('click', e => {
 /* ============================================================
    九、初始化
    ============================================================ */
+/* URL hash 路由：#home/#scanning/#result/#processing/#completed/#settings
+   直接定位各屏，便于预览面板与导出截图查看每一页设计 */
+const DEFAULT_VIEW = 'home'; // 导出各屏预览时可临时改为 'result' / 'processing' / 'completed'
+function applyHash() {
+  const v = location.hash.replace('#', '') || DEFAULT_VIEW;
+  if (v === 'result') showResult();
+  else if (v === 'processing') showProcessingStatic();
+  else if (v === 'completed') finishProcess(false);
+  else if (v === 'scanning') { setView('scanning'); updateStatus('scanning'); $('#scanFound').textContent = FOUND; $('#scanFolder').textContent = FOLDER; }
+  else if (v === 'settings') openSettings();
+  else { setView('home'); updateStatus('ready'); }
+}
+
 function init() {
   fitWindow();
   window.addEventListener('resize', fitWindow);
@@ -586,7 +702,8 @@ function init() {
     });
   });
 
-  updateStatus('ready');
+  applyHash();
+  window.addEventListener('hashchange', applyHash);
 }
 
 document.addEventListener('DOMContentLoaded', init);

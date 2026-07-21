@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "processing.html",
+  "entry": "processing.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-07-21T11:28:27.723Z",
+  "updatedAt": "2026-07-21T11:28:27.723Z",
+  "metadata": {
+    "inferred": true,
+    "reconciled": true
+  }
+}

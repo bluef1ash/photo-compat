@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1180,initial-scale=1">
+<title>扫描结果 · 照片适配助手</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+  .window{transform:none;width:1100px;height:720px}
+  .view{display:block!important;padding:24px 32px 32px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17v.5"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 16l-5-5-9 9"/></symbol>
+</svg>
+<div class="window">
+  <header class="titlebar">
+    <div class="tb-left"><div class="tb-logo">📁</div><span class="tb-appname">照片适配助手</span></div>
+    <div class="tb-right"><span class="mode-badge">标准兼容模式</span>
+      <div class="sys-btns"><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button><button class="sys-btn close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+    </div>
+  </header>
+  <nav class="stepper">
+    <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">选目录</div></div>
+    <div class="step-line" style="background:var(--accent)"></div>
+    <div class="step current"><div class="step-num">2</div><div class="step-label">查看结果</div></div>
+    <div class="step-line"></div><div class="step"><div class="step-num">3</div><div class="step-label">处理</div></div>
+    <div class="step-line"></div><div class="step"><div class="step-num">4</div><div class="step-label">完成</div></div>
+  </nav>
+  <main class="main">
+    <section class="view" data-view="result">
+      <div class="result-head">
+        <div><div class="result-title">扫描完成</div><div class="result-path">E:\照片\2026民政采集</div></div>
+        <span class="resel">← 重新选择</span>
+      </div>
+      <div class="stat-grid cols-4 mb4">
+        <div class="stat-card"><div class="stat-num">230</div><div class="stat-label">总图片数</div></div>
+        <div class="stat-card"><div class="stat-num">230</div><div class="stat-label">预计输出数量</div></div>
+        <div class="stat-card"><div class="stat-num small">约 48 <span class="stat-unit">MB</span></div><div class="stat-label">预计输出大小</div></div>
+        <div class="stat-card"><div class="stat-num small">减少 12 <span class="stat-unit">MB</span></div><div class="stat-label">预计节省</div></div>
+      </div>
+      <div class="block-label">格式分布</div>
+      <div class="card format-card mb4">
+        <div class="fmt-grid">
+          <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">JPEG <span class="badge ok">无需转换</span></span><span class="fmt-count">201</span></div><div class="fmt-bar"><i style="width:87%"></i></div></div>
+          <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">PNG <span class="badge convert">将转换</span></span><span class="fmt-count">15</span></div><div class="fmt-bar"><i style="width:6.5%"></i></div></div>
+          <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">HEIC <span class="badge convert">将转换</span></span><span class="fmt-count">8</span></div><div class="fmt-bar"><i style="width:3.5%"></i></div></div>
+          <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">WebP <span class="badge convert">将转换</span></span><span class="fmt-count">3</span></div><div class="fmt-bar"><i style="width:1.3%"></i></div></div>
+          <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">GIF</span><span class="fmt-count">2</span></div><div class="fmt-bar"><i style="width:0.9%"></i></div></div>
+          <div class="fmt-item"><div class="fmt-top"><span class="fmt-name">TIFF <span class="badge convert">将转换</span></span><span class="fmt-count">1</span></div><div class="fmt-bar"><i style="width:0.4%"></i></div></div>
+          <div class="fmt-item" style="opacity:.5"><div class="fmt-top"><span class="fmt-name">BMP</span><span class="fmt-count">0</span></div><div class="fmt-bar"><i style="width:0"></i></div></div>
+        </div>
+      </div>
+      <div class="block-label">图片文件列表</div>
+      <div class="card mb4" style="padding:16px 18px">
+        <div class="file-list-head"><h3>共 230 张图片</h3><span class="fl-count">显示前 12 张<a class="fl-link">查看全部</a></span></div>
+        <div class="file-list-body" id="fileListBody">
+          <div class="file-item" data-idx="0" tabindex="0"><img class="file-thumb" src="assets/thumb-id.jpg" alt=""><div class="file-info"><div class="file-name">IMG_2026_0142.HEIC</div><div class="file-meta">4032×3024 · 2.4 MB</div></div><span class="badge convert">HEIC</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="1" tabindex="0"><img class="file-thumb" src="assets/thumb-cert.jpg" alt=""><div class="file-info"><div class="file-name">身份证_正面.jpg</div><div class="file-meta">1024×768 · 856 KB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+          <div class="file-item" data-idx="2" tabindex="0"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">户口本_首页.png</div><div class="file-meta">2480×3508 · 1.8 MB</div></div><span class="badge convert">PNG</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="3" tabindex="0"><img class="file-thumb" src="assets/thumb-scene.jpg" alt=""><div class="file-info"><div class="file-name">现场照片_001.jpg</div><div class="file-meta">4032×3024 · 3.1 MB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+          <div class="file-item" data-idx="4" tabindex="0"><img class="file-thumb" src="assets/thumb-id.jpg" alt=""><div class="file-info"><div class="file-name">IMG_2026_0143.HEIC</div><div class="file-meta">4032×3024 · 2.6 MB</div></div><span class="badge convert">HEIC</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="5" tabindex="0"><img class="file-thumb" src="assets/thumb-cert.jpg" alt=""><div class="file-info"><div class="file-name">资格证明.webp</div><div class="file-meta">1600×1200 · 620 KB</div></div><span class="badge convert">WebP</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="6" tabindex="0"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">户口本_本人页.png</div><div class="file-meta">2480×3508 · 1.9 MB</div></div><span class="badge convert">PNG</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="7" tabindex="0"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">申请表_扫描.jpg</div><div class="file-meta">2000×2800 · 1.2 MB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+          <div class="file-item" data-idx="8" tabindex="0"><img class="file-thumb" src="assets/thumb-id.jpg" alt=""><div class="file-info"><div class="file-name">IMG_2026_0144.HEIC</div><div class="file-meta">4032×3024 · 2.5 MB</div></div><span class="badge convert">HEIC</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="9" tabindex="0"><img class="file-thumb" src="assets/thumb-doc.jpg" alt=""><div class="file-info"><div class="file-name">老档案_001.tiff</div><div class="file-meta">3200×2400 · 5.4 MB</div></div><span class="badge convert">TIFF</span><span class="badge accent">转 JPEG</span></div>
+          <div class="file-item" data-idx="10" tabindex="0"><img class="file-thumb" src="assets/thumb-scene.jpg" alt=""><div class="file-info"><div class="file-name">现场照片_002.jpg</div><div class="file-meta">4032×3024 · 2.8 MB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+          <div class="file-item" data-idx="11" tabindex="0"><img class="file-thumb" src="assets/thumb-cert.jpg" alt=""><div class="file-info"><div class="file-name">证件_背面.jpg</div><div class="file-meta">1024×768 · 780 KB</div></div><span class="badge ok">JPEG</span><span class="badge accent">去除 EXIF</span></div>
+        </div>
+      </div>
+
+      <div class="block-label">兼容性问题与警告</div>
+      <div class="mb4">
+        <div class="infobar warn"><svg class="ib-icon"><use href="#i-warn"/></svg><div class="ib-content"><div class="ib-title">检测到 8 张 HEIC（iPhone 照片）</div><div class="ib-desc">几乎所有老旧系统都不支持 HEIC，将自动转换为 JPEG。</div></div></div>
+        <div class="infobar warn"><svg class="ib-icon"><use href="#i-warn"/></svg><div class="ib-content"><div class="ib-title">检测到 3 个暂不支持的文件 <span class="badge warn">点击查看</span></div><div class="ib-desc">PSD 设计源文件 ×2、RAW 相机原始文件 ×1，将跳过。</div></div></div>
+        <div class="infobar err"><svg class="ib-icon"><use href="#i-warn"/></svg><div class="ib-content"><div class="ib-title">3 张图片疑似损坏</div><div class="ib-desc">将被跳过并记录到日志，不影响其余文件处理。</div></div></div>
+      </div>
+      <div class="card mb4">
+        <div class="output-summary">
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> 输出到 <b>同目录 / compat 文件夹</b></span>
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> <b>保留</b>文件夹结构</span>
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> <b>不覆盖</b>已存在文件</span>
+          <span class="os-item"><svg><use href="#i-check-s"/></svg> JPEG 质量 <b>90</b></span>
+          <span class="os-modify">修改</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div class="action-bar active">
+    <div class="ab-info">共 <b>230</b> 张，预计输出约 48 MB</div>
+    <button class="btn btn-secondary">取消</button>
+    <button class="btn btn-primary"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg> 开始处理</button>
+  </div>
+  <footer class="statusbar"><div class="sb-left"><span class="sb-dot"></span><span>就绪</span></div><div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div><div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span>v1.0</span></div></footer>
+</div>
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
+<script>
+const FILES=[
+ {name:'IMG_2026_0142.HEIC',fmt:'HEIC',size:'2.4 MB',dim:'4032×3024',status:'转 JPEG',thumb:'assets/thumb-id.jpg'},
+ {name:'身份证_正面.jpg',fmt:'JPEG',size:'856 KB',dim:'1024×768',status:'去除 EXIF',thumb:'assets/thumb-cert.jpg'},
+ {name:'户口本_首页.png',fmt:'PNG',size:'1.8 MB',dim:'2480×3508',status:'转 JPEG',thumb:'assets/thumb-doc.jpg'},
+ {name:'现场照片_001.jpg',fmt:'JPEG',size:'3.1 MB',dim:'4032×3024',status:'去除 EXIF',thumb:'assets/thumb-scene.jpg'},
+ {name:'IMG_2026_0143.HEIC',fmt:'HEIC',size:'2.6 MB',dim:'4032×3024',status:'转 JPEG',thumb:'assets/thumb-id.jpg'},
+ {name:'资格证明.webp',fmt:'WebP',size:'620 KB',dim:'1600×1200',status:'转 JPEG',thumb:'assets/thumb-cert.jpg'},
+ {name:'户口本_本人页.png',fmt:'PNG',size:'1.9 MB',dim:'2480×3508',status:'转 JPEG',thumb:'assets/thumb-doc.jpg'},
+ {name:'申请表_扫描.jpg',fmt:'JPEG',size:'1.2 MB',dim:'2000×2800',status:'去除 EXIF',thumb:'assets/thumb-doc.jpg'},
+ {name:'IMG_2026_0144.HEIC',fmt:'HEIC',size:'2.5 MB',dim:'4032×3024',status:'转 JPEG',thumb:'assets/thumb-id.jpg'},
+ {name:'老档案_001.tiff',fmt:'TIFF',size:'5.4 MB',dim:'3200×2400',status:'转 JPEG',thumb:'assets/thumb-doc.jpg'},
+ {name:'现场照片_002.jpg',fmt:'JPEG',size:'2.8 MB',dim:'4032×3024',status:'去除 EXIF',thumb:'assets/thumb-scene.jpg'},
+ {name:'证件_背面.jpg',fmt:'JPEG',size:'780 KB',dim:'1024×768',status:'去除 EXIF',thumb:'assets/thumb-cert.jpg'}
+];
+let pi=0;
+function openP(i){pi=i;const f=FILES[i];const wc=/HEIC|PNG|WebP|TIFF/.test(f.fmt);
+ document.getElementById('modalBox').innerHTML='<div class="modal preview-modal"><div class="modal-head"><div class="modal-title">'+f.name+'</div></div><div class="modal-body"><div class="preview-stage"><div class="preview-nav prev" onclick="navP(-1)">‹</div><img src="'+f.thumb+'" alt=""><div class="preview-nav next" onclick="navP(1)">›</div></div><div class="preview-info"><div class="pi"><div class="k">原始格式</div><div class="v">'+f.fmt+(wc?' → JPEG':'')+'</div></div><div class="pi"><div class="k">尺寸</div><div class="v">'+f.dim+'</div></div><div class="pi"><div class="k">大小</div><div class="v">'+f.size+'</div></div><div class="pi"><div class="k">将执行</div><div class="v">'+f.status+' · 质量 90</div></div><div class="pi"><div class="k">序号</div><div class="v">'+(i+1)+' / 12</div></div></div></div><div class="modal-actions"><button class="btn btn-primary" onclick="closeM()">关闭</button></div></div>';
+ document.getElementById('modalOverlay').classList.add('show');}
+function navP(d){openP((pi+d+FILES.length)%FILES.length);}
+function closeM(){document.getElementById('modalOverlay').classList.remove('show');}
+document.querySelectorAll('.file-item').forEach(function(it){var i=+it.dataset.idx;it.addEventListener('click',function(){openP(i);});it.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();openP(i);}});});
+document.addEventListener('keydown',function(e){var show=document.getElementById('modalOverlay').classList.contains('show');if(!show)return;if(e.key==='Escape')closeM();if(e.key==='ArrowLeft')navP(-1);if(e.key==='ArrowRight')navP(1);});
+</script>
+</body>
+</html>

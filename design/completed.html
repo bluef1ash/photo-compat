@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1180,initial-scale=1">
+<title>处理完成 · 照片适配助手</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+  .window{transform:none;width:1100px;height:720px}
+  .view{display:block!important;padding:24px 32px 32px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></symbol>
+</svg>
+<div class="window">
+  <header class="titlebar">
+    <div class="tb-left"><div class="tb-logo">📁</div><span class="tb-appname">照片适配助手</span></div>
+    <div class="tb-right"><span class="mode-badge">标准兼容模式</span>
+      <div class="sys-btns"><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/></svg></button><button class="sys-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5.5" y="5.5" width="13" height="13" rx="1"/></svg></button><button class="sys-btn close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>
+    </div>
+  </header>
+  <nav class="stepper">
+    <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">选目录</div></div>
+    <div class="step-line" style="background:var(--accent)"></div>
+    <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">查看结果</div></div>
+    <div class="step-line" style="background:var(--accent)"></div>
+    <div class="step done"><div class="step-num"><svg class="step-check" style="display:inline-flex;color:#fff"><use href="#i-check-s"/></svg></div><div class="step-label">处理</div></div>
+    <div class="step-line" style="background:var(--accent)"></div>
+    <div class="step current"><div class="step-num">4</div><div class="step-label">完成</div></div>
+  </nav>
+  <main class="main">
+    <section class="view" data-view="completed">
+      <div class="completed-hero">
+        <div class="cmp-check"><svg viewBox="0 0 24 24"><path d="M5 12l4 4 10-10" pathLength="100" style="stroke-dashoffset:0"/></svg></div>
+        <div class="cmp-title">处理完成！</div>
+        <div class="cmp-sub">227 张照片已转换为兼容格式</div>
+      </div>
+      <div class="stat-grid cols-4 mb4">
+        <div class="stat-card"><div class="stat-num">230</div><div class="stat-label">总计处理</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--success)">227</div><div class="stat-label">成功</div></div>
+        <div class="stat-card"><div class="stat-num small">0</div><div class="stat-label">失败</div></div>
+        <div class="stat-card skip"><div class="stat-num small" style="color:var(--fg-muted)">3</div><div class="stat-label">跳过（损坏）</div></div>
+      </div>
+      <div class="card summary-card mb4">
+        <div class="section-title" style="margin-bottom:12px">已应用的兼容设置</div>
+        <div class="sc-row"><span class="k">兼容模式</span><span class="v">标准兼容模式</span></div>
+        <div class="sc-row"><span class="k">JPEG 质量</span><span class="v">90</span></div>
+        <div class="sc-row"><span class="k">已执行</span><span class="v">去除 EXIF · 去除 ICC · 修正方向 · 转 Baseline · 转换 HEIC · 限制 4096px</span></div>
+      </div>
+      <div class="card output-card mb4">
+        <div class="section-title" style="margin-bottom:8px">输出位置</div>
+        <div class="out-path">E:\照片\2026民政采集\compat</div>
+        <div class="out-structure"><svg><use href="#i-check-s"/></svg> 已保留原文件夹结构 · 共 227 个文件 · 约 48 MB</div>
+      </div>
+    </section>
+  </main>
+  <div class="action-bar active">
+    <div class="ab-info">处理用时 01:12 · 平均 3.1 张/秒</div>
+    <button class="btn btn-subtle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4"/></svg> 导出日志</button>
+    <button class="btn btn-secondary">处理另一个文件夹</button>
+    <button class="btn btn-primary btn-large">打开输出目录</button>
+  </div>
+  <footer class="statusbar"><div class="sb-left"><span class="sb-dot"></span><span>处理完成</span></div><div class="sb-center">标准兼容模式<span class="sb-sep">·</span>输出到 同目录/compat</div><div class="sb-right"><span>离线</span><span class="sb-sep">·</span><span>v1.0</span></div></footer>
+</div>
+</body>
+</html>

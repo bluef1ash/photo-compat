@@ -182,6 +182,15 @@
         </div>
       </div>
 
+      <div class="block-label">图片文件列表</div>
+      <div class="card mb4" style="padding:16px 18px">
+        <div class="file-list-head">
+          <h3>共 230 张图片</h3>
+          <span class="fl-count">显示前 12 张<a class="fl-link">查看全部</a></span>
+        </div>
+        <div class="file-list-body" id="fileListBody" data-od-id="scan-file-list"></div>
+      </div>
+
       <div class="block-label">兼容性问题与警告</div>
       <div class="warn-list mb4">
         <div class="infobar warn">
@@ -208,14 +217,6 @@
         </div>
       </div>
 
-      <div class="action-bar">
-        <div class="ab-info">共 <b id="abTotal">230</b> 张，预计输出约 48 MB</div>
-        <button class="btn btn-secondary" id="btnResultCancel">取消</button>
-        <button class="btn btn-primary" id="btnStart">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg>
-          开始处理
-        </button>
-      </div>
     </section>
 
     <!-- ----- 处理中 ----- -->
@@ -248,18 +249,6 @@
         <div class="log-list" id="logList"></div>
       </div>
 
-      <div class="action-bar">
-        <div class="ab-info">标准兼容模式 · 质量 90 · 去除 EXIF/ICC</div>
-        <button class="btn btn-subtle" id="btnOpenLog">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/></svg>
-          打开日志文件
-        </button>
-        <button class="btn btn-destructive" id="btnCancel">取消</button>
-        <button class="btn btn-secondary" id="btnPause">
-          <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>
-          暂停
-        </button>
-      </div>
     </section>
 
     <!-- ----- 完成 ----- -->
@@ -290,18 +279,6 @@
         <div class="out-structure"><svg><use href="#i-check-s"/></svg> 已保留原文件夹结构 · 共 227 个文件 · 约 48 MB</div>
       </div>
 
-      <div class="action-bar">
-        <div class="ab-info">处理用时 01:12 · 平均 3.1 张/秒</div>
-        <button class="btn btn-subtle" id="btnExport">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4"/></svg>
-          导出日志
-        </button>
-        <button class="btn btn-secondary" id="btnAnother">处理另一个文件夹</button>
-        <button class="btn btn-primary btn-large" id="btnOpenOut">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l4-4h4v4H7v6h4l-4 4-4-4z" transform="rotate(-90 9 12) translate(3 -3)"/><path d="M5 11h14M14 8l4 4-4 4"/></svg>
-          打开输出目录
-        </button>
-      </div>
     </section>
 
     <!-- ----- 设置 ----- -->
@@ -409,6 +386,25 @@
     </section>
 
   </main>
+
+  <!-- 底部操作栏（窗口级固定，随当前屏切换显隐，不随内容滚动） -->
+  <div class="action-bar" data-view="result">
+    <div class="ab-info">共 <b id="abTotal">230</b> 张，预计输出约 48 MB</div>
+    <button class="btn btn-secondary" id="btnResultCancel">取消</button>
+    <button class="btn btn-primary" id="btnStart"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg>开始处理</button>
+  </div>
+  <div class="action-bar" data-view="processing">
+    <div class="ab-info">标准兼容模式 · 质量 90 · 去除 EXIF/ICC</div>
+    <button class="btn btn-subtle" id="btnOpenLog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/></svg>打开日志文件</button>
+    <button class="btn btn-destructive" id="btnCancel">取消</button>
+    <button class="btn btn-secondary" id="btnPause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>暂停</button>
+  </div>
+  <div class="action-bar" data-view="completed">
+    <div class="ab-info">处理用时 01:12 · 平均 3.1 张/秒</div>
+    <button class="btn btn-subtle" id="btnExport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4"/></svg>导出日志</button>
+    <button class="btn btn-secondary" id="btnAnother">处理另一个文件夹</button>
+    <button class="btn btn-primary btn-large" id="btnOpenOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l4-4h4v4H7v6h4l-4 4-4-4z" transform="rotate(-90 9 12) translate(3 -3)"/><path d="M5 11h14M14 8l4 4-4 4"/></svg>打开输出目录</button>
+  </div>
 
   <!-- ============ 状态栏 ============ -->
   <footer class="statusbar">
