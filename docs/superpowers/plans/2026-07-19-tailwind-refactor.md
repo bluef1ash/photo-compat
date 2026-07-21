@@ -259,7 +259,7 @@ git commit -m "refactor(前端): 标题栏/状态栏/步骤条内联 style 转 T
 
 - [ ] **步骤 2:ProgressBar(CSS 变量 + 任意值类)**
 
-轨道:`<div className="h-2 bg-border rounded-sm overflow-hidden">`。填充:`<div className="h-full bg-accent transition-[width] duration-150 ease-out w-[var(--progress)]" style={{ "--progress": \`${Math.min(100, Math.max(0, value))}%\` } as React.CSSProperties} />`。**仅此一处 `style` 设置 CSS 变量**(规格允许),禁其他样式属性。
+轨道:`<div className="h-2 bg-border rounded-sm overflow-hidden">`。填充:`<div className="h-full bg-accent transition-[width] duration-150 ease-out w-(--progress)" style={{ "--progress": \`${Math.min(100, Math.max(0, value))}%\` } as React.CSSProperties} />`。**仅此一处 `style` 设置 CSS 变量**(规格允许),禁其他样式属性。
 
 - [ ] **步骤 3:验证**
 
