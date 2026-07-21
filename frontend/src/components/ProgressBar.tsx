@@ -1,10 +1,9 @@
-import React from "react";
+import { LinearProgress } from '@mui/material'
+import type React from 'react'
+
+// 钳制到 [0,100];MUI LinearProgress determinate 自动带 aria-valuenow/min/max
+const clamp = (v: number) => Math.min(100, Math.max(0, v))
 
 export const ProgressBar: React.FC<{ value: number }> = ({ value }) => (
-  <div className="h-2 bg-border rounded-sm overflow-hidden">
-    <div
-      className="h-full bg-accent transition-[width] duration-150 ease-out w-[var(--progress)]"
-      style={{ "--progress": `${Math.min(100, Math.max(0, value))}%` } as React.CSSProperties}
-    />
-  </div>
-);
+  <LinearProgress variant="determinate" value={clamp(value)} />
+)
