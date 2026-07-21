@@ -20,11 +20,11 @@ describe('StatCard', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
   })
 
-  it('tone=error/muted 不抛错', () => {
+  it('tone=error/skip 不抛错', () => {
     renderWithTheme(
       <>
         <StatCard value={1} label="失败" tone="error" />
-        <StatCard value={2} label="跳过" tone="muted" />
+        <StatCard value={2} label="跳过" tone="skip" />
       </>,
     )
     expect(screen.getByText('失败')).toBeInTheDocument()
