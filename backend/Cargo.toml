@@ -33,6 +33,7 @@ thiserror = "1"
 walkdir = "2"
 opener = "0.7"
 tokio = "1"
+chrono = "0.4"
 
 [dev-dependencies]
 tempfile = "3"

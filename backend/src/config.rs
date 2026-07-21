@@ -21,6 +21,23 @@ pub struct Config {
     // 性能(§10.13)
     /// MVP:后端并行由 rayon 默认控制,此字段当前未生效;精确并行数控制是后续增量。
     pub parallel: usize,
+    // 高级 / 通用（新字段，#[serde(default)] 兼容旧 config.json）
+    #[serde(default = "default_log_level")]
+    pub log_level: String, // "normal" | "verbose"
+    #[serde(default = "default_log_retention_days")]
+    pub log_retention_days: u32,
+    #[serde(default)]
+    pub temp_dir: Option<String>, // None=用系统默认；接线为后续增量
+    #[serde(default)]
+    pub last_folder: Option<String>, // 启动恢复上次文件夹（通用分组）
+}
+
+fn default_log_level() -> String {
+    "normal".to_string()
+}
+
+fn default_log_retention_days() -> u32 {
+    30
 }
 
 impl Default for Config {
@@ -39,6 +56,10 @@ impl Default for Config {
             overwrite: false,
             keep_structure: true,
             parallel: default_parallel(),
+            log_level: default_log_level(),
+            log_retention_days: default_log_retention_days(),
+            temp_dir: None,
+            last_folder: None,
         }
     }
 }
@@ -77,8 +98,6 @@ impl Config {
     }
 }
 
-// src-tauri/src/config.rs - 先只写测试，实现待补充
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,6 +119,11 @@ mod tests {
         assert_eq!(c.subfolder, "compat");
         assert!(!c.overwrite);
         assert!(c.keep_structure);
+        // 新字段默认
+        assert_eq!(c.log_level, "normal");
+        assert_eq!(c.log_retention_days, 30);
+        assert!(c.temp_dir.is_none());
+        assert!(c.last_folder.is_none());
     }
 
     #[test]
@@ -109,6 +133,7 @@ mod tests {
         let back: Config = serde_json::from_str(&json).unwrap();
         assert_eq!(back.jpeg_quality, c.jpeg_quality);
         assert_eq!(back.subfolder, c.subfolder);
+        assert_eq!(back.log_level, c.log_level);
     }
 
     #[test]
@@ -117,5 +142,30 @@ mod tests {
         let bad = "{ not valid json";
         let c: Config = serde_json::from_str(bad).unwrap_or_default();
         assert_eq!(c.jpeg_quality, 90);
+    }
+
+    #[test]
+    fn legacy_config_without_new_fields_loads() {
+        // 旧 config.json（无 log_level 等新字段）应能加载，新字段取默认
+        let legacy = r#"{
+            "remove_exif": false,
+            "remove_icc": true,
+            "auto_orient": true,
+            "baseline_jpeg": true,
+            "convert_heic": true,
+            "to_srgb": true,
+            "jpeg_quality": 80,
+            "max_width": 2048,
+            "max_height": 2048,
+            "subfolder": "out",
+            "overwrite": false,
+            "keep_structure": false,
+            "parallel": 2
+        }"#;
+        let c: Config = serde_json::from_str(legacy).unwrap();
+        assert_eq!(c.jpeg_quality, 80); // 保留旧值
+        assert_eq!(c.subfolder, "out");
+        assert_eq!(c.log_level, "normal"); // 新字段取默认
+        assert_eq!(c.log_retention_days, 30);
     }
 }
