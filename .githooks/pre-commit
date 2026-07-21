@@ -1,0 +1,40 @@
+#!/bin/sh
+set -euo pipefail
+
+# 颜色输出
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+fail() {
+	echo -e "${RED}[失败]${NC} $1"; exit 1;
+}
+
+ok()   {
+	echo -e "${GREEN}[通过]${NC} $1";
+}
+
+# --- 后端：Rust 代码检查（Tauri src-tauri）---
+# 检查项：cargo fmt 格式校验 + cargo clippy 静态分析（告警即失败）
+# 守卫：源码未就绪时跳过，避免在无 src-tauri 目录的阶段误阻断提交
+if [ -d src-tauri ]; then
+	echo -e "${YELLOW}=== 后端 cargo fmt + clippy ===${NC}"
+	if (cd src-tauri && cargo fmt --check && cargo clippy --all-targets -- -D warnings); then
+		ok "cargo fmt + clippy"
+	else
+		fail "Rust 代码检查未通过（格式或 clippy 警告），请修复后再提交"
+	fi
+else
+	echo -e "${YELLOW}=== 跳过后端检查（未发现 src-tauri 目录）===${NC}"
+fi
+
+# --- 前端管理：pnpm precommit ---
+echo -e "${YELLOW}=== 前端管理 pnpm precommit ===${NC}"
+if (cd frontend && pnpm precommit); then
+	ok "precommit"
+else
+	fail "precommit 检查未通过，请修复后再提交"
+fi
+
+echo -e "${GREEN}所有检查通过，允许提交${NC}"
