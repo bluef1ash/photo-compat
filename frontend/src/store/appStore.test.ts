@@ -8,6 +8,10 @@ vi.mock('../ipc/commands', () => ({
   pauseProcess: vi.fn(),
   resumeProcess: vi.fn(),
   openOutput: vi.fn(),
+  loadSettings: vi.fn(),
+  saveSettings: vi.fn(),
+  openLog: vi.fn(),
+  exportLog: vi.fn(),
 }))
 
 // mock Tauri dialog API
@@ -58,6 +62,11 @@ describe('appStore 状态机', () => {
       total: 0,
       by_format: {},
       unsupported: [],
+      unsupported_groups: [],
+      files_detail: [],
+      total_source_size: 0,
+      estimated_output_size: 0,
+      warnings: { heic_count: 0, corrupt_count: 0, unsupported_groups: [] },
       source_dir: '/test/path',
     })
 
