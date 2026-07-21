@@ -23,20 +23,17 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
-            // 日志
-            let log_dir = app
-                .path()
-                .app_data_dir()
-                .expect("无法获取 app_data_dir 目录")
-                .join("logs");
-            let _guard = log::init(log_dir);
-            app.manage(_guard); // 保活
-            // 配置
-            let cfg_dir = app
+            // 配置优先：先加载（拿 log_level），再据此初始化日志
+            let data_dir = app
                 .path()
                 .app_data_dir()
                 .expect("无法获取 app_data_dir 目录");
-            let config = Config::load(&cfg_dir);
+            let config = Config::load(&data_dir);
+
+            let log_dir = data_dir.join("logs");
+            let _guard = log::init(log_dir, &config.log_level);
+            app.manage(_guard); // 保活
+
             app.manage(AppState::new(config));
             Ok(())
         })
@@ -48,6 +45,10 @@ pub fn run() {
             commands::pause_process_cmd,
             commands::resume_process_cmd,
             commands::open_output_cmd,
+            commands::load_settings_cmd,
+            commands::save_settings_cmd,
+            commands::open_log_cmd,
+            commands::export_log_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
