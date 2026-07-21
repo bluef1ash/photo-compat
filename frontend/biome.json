@@ -6,16 +6,41 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": [
-      "**",
-      "!!**/dist"
-    ]
+    "includes": ["**", "!**/dist", "!**/public"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noDebugger": "warn",
+        "noArrayIndexKey": "warn"
+      },
+      "style": {
+        "useBlockStatements": "error",
+        "noNestedTernary": "error",
+        "noNonNullAssertion": "off"
+      },
+      "complexity": {
+        "noBannedTypes": "warn"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "warn",
+        "useJsxKeyInIterable": "error"
+      }
+    },
+    "domains": {
+      "react": "recommended",
+      "test": "recommended"
+    }
   },
   "css": {
     "parser": {
