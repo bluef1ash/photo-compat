@@ -1,8 +1,8 @@
+import { Box } from '@mui/material'
 import type React from 'react'
 import { StatusBar } from './components/StatusBar'
 import { Stepper } from './components/Stepper'
 import { TitleBar } from './components/TitleBar'
-import { IconSprite } from './icons/Icons'
 import { useAppStore } from './store/appStore'
 import { CompletedView } from './views/Completed'
 import { HomeView } from './views/Home'
@@ -13,19 +13,18 @@ import { ScanningView } from './views/Scanning'
 const App: React.FC = () => {
   const view = useAppStore((s) => s.view)
   return (
-    <div className="h-full flex flex-col">
-      <IconSprite />
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <TitleBar />
       {view !== 'home' && <Stepper />}
-      <main className="flex-1 overflow-auto p-6">
+      <Box component="main" sx={{ flex: 1, overflow: 'auto', p: 3 }}>
         {view === 'home' && <HomeView />}
         {view === 'scanning' && <ScanningView />}
         {view === 'result' && <ResultView />}
         {view === 'processing' && <ProcessingView />}
         {view === 'completed' && <CompletedView />}
-      </main>
+      </Box>
       <StatusBar />
-    </div>
+    </Box>
   )
 }
 
