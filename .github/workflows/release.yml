@@ -1,0 +1,104 @@
+# 发布工作流：推送 v* 标签时构建多平台发行版并上传到 GitHub Release
+#
+# 覆盖目标（均原生构建，避免交叉编译 webkit2gtk 的依赖地狱）：
+#   Windows x86_64 / aarch64   Linux x86_64 / aarch64   macOS x86_64 / aarch64
+#
+# 说明：
+# - windows-11-arm、ubuntu-22.04-arm 为 GitHub 托管 ARM runner，public 仓库免费可用；
+#   私有仓库若不可用，把对应行的 os 改回 windows-latest / ubuntu-22.04 并自行配置交叉工具链。
+# - 产物随 tauri.conf.json 的 bundle.targets=all 生成：Windows .msi/.exe、Linux .deb/.AppImage、macOS .dmg/.app。
+# - 发布为 draft，需手动核对后发布。
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# 同一 tag 并发只跑一次
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: windows-x86_64
+          - os: windows-11-arm
+            target: aarch64-pc-windows-msvc
+            label: windows-aarch64
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            label: linux-x86_64
+          - os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            label: linux-aarch64
+          - os: macos-13
+            target: x86_64-apple-darwin
+            label: macos-x86_64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            label: macos-aarch64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Linux（含 ARM runner）需 webkit2gtk 等系统依赖
+      - name: 安装 Linux 系统依赖
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: 安装 Rust 工具链（含目标架构）
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: 缓存 Cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+
+      - name: 安装前端依赖
+        run: pnpm install --frozen-lockfile
+        working-directory: frontend
+
+      - name: 构建并发布（tauri-action）
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: backend
+          tagName: ${{ github.ref_name }}
+          releaseName: '照片适配助手 ${{ github.ref_name }}'
+          releaseBody: |
+            多平台发行版（本次构建目标：${{ matrix.label }}）。
+            - Windows：.msi 安装包 / .exe（NSIS）
+            - Linux：.deb 安装包 / .AppImage 免安装
+            - macOS：.dmg / .app
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.target }}
