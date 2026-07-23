@@ -1,6 +1,6 @@
 # Backend 后端规则
 
-> 子目录规则,补充根 [CLAUDE.md](../CLAUDE.md)(项目级约束见根)。后端:Tauri 2.x + Rust。
+> 子目录规则,补充根 [AGENTS.md](../AGENTS.md)(项目级约束见根)。后端:Tauri 2.x + Rust。
 
 ## 目录结构
 

@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -6,15 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 照片 EXIF 兼容化桌面工具(代号 PhotoCompat / 照片适配助手)。**只做一件事**:把一个目录里的图片批量转成老旧政务/医疗/教育系统能上传的标准 JPEG——移除 EXIF/ICC、修正方向、转换 HEIC、限制尺寸、统一 sRGB。它不是图像编辑器,不是云相册,不是 AI 工具。
 
-## 当前状态
+## 编写代码行为准则
 
-⚠️ 项目处于**设计阶段,尚无任何源码**。仓库现有:
-
-- `design/照片兼容化工具-UI设计规范.md` — 完整 UI/UX 设计规范(v1.0),**是实现 UI/交互的唯一权威依据**。包含视觉令牌、9 个屏幕设计、组件规范、错误处理矩阵、兼容性选项词典
-- `design/index.html` — 设计稿高保真原型(单文件 HTML,可直接浏览器打开预览)
-- `.gitignore` — 已按 Cargo/Rust 项目模板配置(Tauri 后端是 Rust)
-
-**当开始搭建工程骨架后,本文件须补充 build / lint / test / 运行单个测试 等命令。**
+- **代码规范**:
+    * **注释**: **强制要求**。必须用中文解释复杂的逻辑。
+    * **增量修改**: 优先进行小的、安全的修改，避免大规模重写，除非有必要。
+    * **文件规模**: 根据高内聚、低耦合的编程思想合理优雅编写代码。单个文件建议不超过 **300 行**，最大上限 **500 行**，严禁超过 **1000 行**。超过限制时必须按职责拆分为多个文件（同 package）进行封装优化。
+    * **功能拆分**: 使用组件化编程规范，在进行复杂功能开发时，先通过结构化思考将大功能拆分为 N 个小功能，搭建好结构框架后，再逐个击破每个小功能的具体实现。不要一开始就陷入细节。
+    * **工具函数**: 可复用的通用工具函数（如参数解析、类型转换等）统一存放于 `backend/src/utils/` 目录，避免在各个服务中重复定义。
+    * **严禁重复造轮子**: 开发任何新功能前，**必须先检查**现有代码库中是否已有可复用的组件、函数、工具库。若已有相似实现但缺少所需功能，**必须扩展现有实现**而非新建。例如：前端某组件已在 `src/components/` 封装但缺少一个功能，应在原组件上扩展，禁止新建同类组件；后端 `backend/src/utils/` 已有类似工具函数，应增强原函数而非另起炉灶。此规则前后端全部适用。
+    * **文档同步**: 涉及业务范围控制链路变更时，必须同步 `README.md`、根/子目录 `AGENTS.md` 中的当前状态说明。
 
 ## 预定技术栈
 
@@ -43,12 +44,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 视觉系统硬约束(摘自 §5-§10)
 
-- 设计令牌(color / spacing / type / elevation)应抽取为设计系统常量统一管理
+- > 设计语言决策变更(2026-07):前端从 Fluent 转向 **Material Design(MUI @mui/material)**。强调色、圆角、字重均改为 Material 标准。此决策已同步至 `frontend/AGENTS.md` 与 `README.md`。
+
+- 设计令牌(color / spacing / type / elevation)经 MUI `extendTheme` 统一生成 `--mui-palette-*` CSS 变量，Tailwind `@theme inline` 反向引用这些变量做令牌桥（MUI 为主，Tailwind 仅作令牌桥）
 - **间距基于 4px 栅格**,禁止 5/7/10 等游离值。令牌: `xxs=4 xs=8 s=12 m=16 l=24 xl=32 xxl=48`
-- 强调色默认 Fluent 系统蓝 `#0067C0`(Light)/ `#4CC2FF`(Dark)。**不用品牌橙红 `#f54900` 作默认强调色**(持续传递警告信号,破坏安全感),仅作可选自定义色提供
-- **字重只用 Regular 400 与 Semibold 600**,不用 Bold 700(Fluent 体系以 Semibold 表强调)
-- 字体栈按平台回退:Windows → Segoe UI Variable + 微软雅黑 UI;Linux → Cantarell + 思源黑体/Noto Sans CJK SC
-- 圆角:按钮/输入框 4px,卡片/对话框/面板/拖拽区 8px
+- 强调色改用 **Material Blue**:Light `#1976D2`(Blue 700) / Dark `#4CC2FF`(Blue Accent 200)。**不用品牌橙红 `#f54900` 作默认强调色**(持续传递警告信号,破坏安全感),仅作可选自定义色提供
+- **字重遵循 Material 标准**:Regular 400 / Medium 500 / Semibold 600,不用 Bold 700(Material 按钮以 Medium 500 表强调,标题用 Semibold 600)
+- 字体栈按平台回退:Windows → Segoe UI Variable + 微软雅黑 UI;Linux → Cantarell + 思源黑体/Noto Sans CJK SC(不引入网络字体)
+- 圆角改用 **Material 体系(偏大)**:按钮 pill(20px) / 基础形状 6px / 卡片 12px / 对话框 16px / 面板/Popover 12px / Chip 8px
 
 ## 默认行为约束(产品默认值,实现时不可改)
 
