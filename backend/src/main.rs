@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    picture_exif_lib::run()
+    photo_compat_lib::run()
 }

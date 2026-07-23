@@ -2912,7 +2912,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "picture-exif"
+name = "photo-compat"
 version = "0.1.0"
 dependencies = [
  "chrono",

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "picture-exif",
+  "productName": "photo-compat",
   "version": "0.1.0",
   "identifier": "com.photocompat.app",
   "build": {
