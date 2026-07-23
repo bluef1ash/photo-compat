@@ -43,6 +43,11 @@ const App = () => {
         return
       }
 
+      // 模态打开时，除 Esc 外不响应全局快捷键，避免预览/确认弹窗内误触发主流程
+      if (s.modal) {
+        return
+      }
+
       if (e.ctrlKey && e.key === ',') {
         e.preventDefault()
         if (s.view === 'settings') {

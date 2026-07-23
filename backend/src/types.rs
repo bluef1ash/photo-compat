@@ -18,6 +18,7 @@ pub enum ProgressState {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileMeta {
     pub name: String,
+    pub path: String, // 文件绝对路径（结果页缩略图用 convertFileSrc 渲染）
     pub format: String, // JPEG/PNG/HEIC...
     pub size_bytes: u64,
     pub width: u32,  // 0 表示未读取（读取失败不阻塞扫描）

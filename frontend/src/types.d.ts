@@ -4,6 +4,7 @@
 /** 单文件元信息（结果页文件列表，前 N 张） */
 export interface FileMeta {
   name: string
+  path: string // 文件绝对路径（结果页缩略图用 convertFileSrc 渲染）
   format: string // JPEG/PNG/HEIC...
   size_bytes: number
   width: number // 0 表示未读取

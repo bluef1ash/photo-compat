@@ -1,7 +1,9 @@
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 import type { FC, ReactNode } from 'react'
 import { type ModalType, useAppStore } from '../store/appStore'
+import type { FileMeta } from '../types'
 import { Button } from './Button'
+import { PreviewDialog } from './PreviewDialog'
 
 const TITLE: Record<ModalType, string> = {
   'error-dir': '目录无法访问',
@@ -52,6 +54,13 @@ export const ModalHost: FC = () => {
   const reset = useAppStore((s) => s.reset)
   const cancel = useAppStore((s) => s.cancel)
   const pushToast = useAppStore((s) => s.pushToast)
+
+  // 预览模态形态独立（大图 + 导航 + 信息区），不走通用 Dialog
+  if (modal?.type === 'preview') {
+    const files = (modal.data?.files as FileMeta[] | undefined) ?? []
+    const initialIndex = (modal.data?.index as number | undefined) ?? 0
+    return <PreviewDialog files={files} initialIndex={initialIndex} onClose={closeModal} />
+  }
 
   const open = !!modal
   const type = modal?.type ?? 'about'

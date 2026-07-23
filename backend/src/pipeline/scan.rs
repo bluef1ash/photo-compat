@@ -162,6 +162,7 @@ fn scan_directory_internal<E>(
                     .file_name()
                     .map(|f| f.to_string_lossy().to_string())
                     .unwrap_or_default(),
+                path: path.to_string_lossy().to_string(),
                 format: fmt.clone(),
                 size_bytes: *size,
                 width: w,
