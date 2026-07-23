@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/* 自定义语义 token（非 MUI palette）：light 默认 + dark 双覆盖。
+   关键背景：MUI 在 defaultMode="system" 下不会给 <html> 写 data-mui-color-scheme 属性，
+   palette 靠 @media(prefers-color-scheme) 切换；此前自定义 token 只挂在属性选择器上，
+   导致系统深色时背景仍取 light 值、文字却已是 dark（白），形成"浅底白字"。
+   现改为：system 模式走 media query，手动切换走属性分支，
+   :not([data-mui-color-scheme="light"]) 保证用户手动锁定浅色时不被系统深色覆盖。 */
+:root {
+  --accent-pressed: #0d47a1;
+  --accent-soft: #bbdefb;
+  --accent-disabled: #9ec9ef;
+  --surface-alt: #fafafa;
+  --success-soft: #e8f5e9;
+  --warning-soft: #fff3e0;
+  --error-soft: #ffebee;
+  --radius-pill: 20px;
+  --radius-lg: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mui-color-scheme="light"]) {
+    --accent-pressed: #7bd1ff;
+    --accent-soft: #0a2b45;
+    --surface-alt: #323232;
+    --success-soft: #1e3a1e;
+    --warning-soft: #3a2e0a;
+    --error-soft: #3a1a18;
+  }
+}
+
+/* 手动锁定深色（设置页"深色"）：属性选择器覆盖 system 的 media query 结果 */
+[data-mui-color-scheme="dark"] {
+  --accent-pressed: #7bd1ff;
+  --accent-soft: #0a2b45;
+  --surface-alt: #323232;
+  --success-soft: #1e3a1e;
+  --warning-soft: #3a2e0a;
+  --error-soft: #3a1a18;
+}
+
 /* 方案 B:Tailwind 令牌反向引用 MUI 生成的变量,与 MUI 组件同源同步。
    令牌对齐 Material 原型（design/assets/styles.css）。 */
 @theme inline {

@@ -67,26 +67,8 @@ export const theme = extendTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
-        // 非 palette 的软色/自定义 token,light/dark 各一套,随 MUI colorScheme 属性切换
-        ':root': {
-          '--accent-pressed': '#0d47a1',
-          '--accent-soft': '#bbdefb',
-          '--accent-disabled': '#9ec9ef',
-          '--surface-alt': '#fafafa',
-          '--success-soft': '#e8f5e9',
-          '--warning-soft': '#fff3e0',
-          '--error-soft': '#ffebee',
-          '--radius-pill': '20px',
-          '--radius-lg': '16px',
-        },
-        '[data-mui-color-scheme="dark"]': {
-          '--accent-pressed': '#7bd1ff',
-          '--accent-soft': '#0a2b45',
-          '--surface-alt': '#323232',
-          '--success-soft': '#1e3a1e',
-          '--warning-soft': '#3a2e0a',
-          '--error-soft': '#3a1a18',
-        },
+        // 自定义语义 token（accent/surface/soft/radius）已迁至 global.css：
+        // system 模式下 MUI 不写 data-mui-color-scheme 属性，只挂属性选择器会造成深色半切换。
       },
     },
     // 卡片/对话框/面板圆角：Material 加大（12/16）。按钮保持 pill
