@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAppStore } from '../../store/appStore'
-import { renderWithTheme } from '../../test-utils'
-import { Stepper } from '../Stepper'
+import { useAppStore } from '../store/appStore'
+import { renderWithTheme } from '../test-utils'
+import { Stepper } from '../components/Stepper'
 
 // mock IPC/Tauri 层,避免 store 加载时的副作用
 vi.mock('../../ipc/commands', () => ({

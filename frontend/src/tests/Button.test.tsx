@@ -1,8 +1,8 @@
 import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { renderWithTheme } from '../../test-utils'
-import { Button } from '../Button'
+import { renderWithTheme } from '../test-utils'
+import { Button } from '../components/Button'
 
 describe('Button', () => {
   it('渲染 children', () => {

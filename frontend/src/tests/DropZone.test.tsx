@@ -1,9 +1,9 @@
 import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { useAppStore } from '../../store/appStore'
-import { renderWithTheme } from '../../test-utils'
-import { DropZone } from '../DropZone'
+import { useAppStore } from '../store/appStore'
+import { renderWithTheme } from '../test-utils'
+import { DropZone } from '../components/DropZone'
 
 vi.mock('../../ipc/commands', () => ({
   scanDirectory: vi.fn(),

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { renderWithTheme } from '../../test-utils'
-import { StatCard } from '../StatCard'
+import { renderWithTheme } from '../test-utils'
+import { StatCard } from '../components/StatCard'
 
 describe('StatCard', () => {
   it('渲染 value 与 label', () => {

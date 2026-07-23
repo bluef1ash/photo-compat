@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { renderWithTheme } from '../../test-utils'
-import { ProgressBar } from '../ProgressBar'
+import { renderWithTheme } from '../test-utils'
+import { ProgressBar } from '../components/ProgressBar'
 
 describe('ProgressBar', () => {
   it('value 越界被钳制到 100 并写入 aria-valuenow', () => {
