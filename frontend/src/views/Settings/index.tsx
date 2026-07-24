@@ -41,7 +41,8 @@ export const SettingsView: FC = () => {
 
   const [group, setGroup] = useState<GroupKey>('general')
   const [prefs, setPrefs] = useState<LocalPrefs>(loadPrefs)
-  const [themeMode, setThemeMode] = useState<'system' | 'light' | 'dark'>('system')
+  const [themeMode, setThemeMode] = useState<'system' | 'light' | 'dark'>(prefs.theme)
+  const [query, setQuery] = useState('')
 
   // 更新后端配置：同步内存 + 持久化
   const update = (patch: Partial<Config>) => {
@@ -61,6 +62,7 @@ export const SettingsView: FC = () => {
   }
   const onTheme = (m: 'system' | 'light' | 'dark') => {
     setThemeMode(m)
+    updatePref({ theme: m })
     if (setMode) {
       setMode(m)
     }
@@ -69,6 +71,10 @@ export const SettingsView: FC = () => {
   // 各分组共享的上下文（config + update + toast / prefs + updatePref）
   const settingsCtx = { config, update, pushToast }
   const prefCtx = { prefs, updatePref }
+
+  // 搜索过滤导航项（空查询显示全部）
+  const trimmed = query.trim()
+  const filteredNav = trimmed ? NAV.filter((n) => n.label.includes(trimmed)) : NAV
 
   return (
     <Box sx={{ display: 'flex', height: '100%' }}>
@@ -106,6 +112,8 @@ export const SettingsView: FC = () => {
         <TextField
           placeholder="搜索设置项"
           size="small"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { fontSize: 13 } }}
           slotProps={{
             input: {
@@ -117,7 +125,12 @@ export const SettingsView: FC = () => {
             },
           }}
         />
-        {NAV.map((n) => (
+        {filteredNav.length === 0 ? (
+          <Box sx={{ fontSize: 12, color: 'var(--mui-palette-text-disabled)', px: '10px', py: 1 }}>
+            无匹配设置项
+          </Box>
+        ) : null}
+        {filteredNav.map((n) => (
           <Box
             key={n.key}
             onClick={() => setGroup(n.key)}
@@ -147,7 +160,7 @@ export const SettingsView: FC = () => {
         {group === 'compat' ? <CompatGroup {...settingsCtx} /> : null}
         {group === 'output' ? <OutputGroup {...settingsCtx} /> : null}
         {group === 'perf' ? <PerfGroup {...settingsCtx} /> : null}
-        {group === 'general' ? <GeneralGroup {...settingsCtx} {...prefCtx} /> : null}
+        {group === 'general' ? <GeneralGroup {...prefCtx} /> : null}
         {group === 'appearance' ? (
           <AppearanceGroup {...prefCtx} themeMode={themeMode} onTheme={onTheme} />
         ) : null}

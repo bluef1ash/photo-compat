@@ -17,6 +17,8 @@ export interface LocalPrefs {
   titlebar: 'custom' | 'system'
   tray: boolean
   reduceAnim: boolean
+  restoreLastFolder: boolean
+  theme: 'system' | 'light' | 'dark'
 }
 
 export function defaultPrefs(): LocalPrefs {
@@ -29,6 +31,8 @@ export function defaultPrefs(): LocalPrefs {
     titlebar: 'custom',
     tray: false,
     reduceAnim: false,
+    restoreLastFolder: true,
+    theme: 'system',
   }
 }
 

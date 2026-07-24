@@ -13,6 +13,7 @@ import type {
   ScanResult,
   View,
 } from '../types'
+import { loadPrefs } from '../views/Settings/prefs'
 
 // MVP 前端默认配置（后端并行实际由 rayon 控制；此处仅 UI 参考）
 const DEFAULT_CONFIG: Config = {
@@ -149,6 +150,7 @@ interface State {
   setLogOpen: (open: boolean) => void
   setConfig: (config: Config) => void
   addRecent: (folder: RecentFolder) => void
+  restoreLastFolder: () => Promise<void>
 }
 
 export const useAppStore = create<State>((set, get) => ({
@@ -199,6 +201,10 @@ export const useAppStore = create<State>((set, get) => ({
         return
       }
       set({ view: 'result', scan: result })
+      // 记录上次文件夹路径（供下次启动恢复，持久化到后端 config.json）
+      const next = { ...get().config, last_folder: path }
+      set({ config: next })
+      void cmd.saveSettings(next)
     } catch (e) {
       un()
       set({ scanUnlisten: null, view: 'home', error: errMsg(e) })
@@ -335,7 +341,7 @@ export const useAppStore = create<State>((set, get) => ({
     set({ config })
     try {
       await cmd.saveSettings(config)
-      get().pushToast('设置已保存', 'success')
+      // 自动保存：每个开关都触发，成功不打扰用户；仅失败时提示
     } catch (e) {
       get().pushToast(`保存失败：${errMsg(e)}`, 'err')
     }
@@ -382,6 +388,17 @@ export const useAppStore = create<State>((set, get) => ({
   setLogOpen: (open) => set({ logOpen: open }),
 
   setConfig: (config) => set({ config }),
+
+  // 启动恢复：若偏好开启且有上次目录，自动进入该目录扫描
+  restoreLastFolder: async () => {
+    const { restoreLastFolder } = loadPrefs()
+    if (restoreLastFolder) {
+      const last = get().config.last_folder
+      if (last) {
+        await get().startScan(last)
+      }
+    }
+  },
 
   addRecent: (folder) => {
     const list = get().recent.filter((r) => r.path !== folder.path)

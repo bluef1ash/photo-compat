@@ -1,4 +1,5 @@
 import { Box } from '@mui/material'
+import { useColorScheme } from '@mui/material/styles'
 import { useEffect } from 'react'
 import { ActionBar } from './components/ActionBar'
 import { MenuFlyout } from './components/MenuFlyout'
@@ -14,14 +15,22 @@ import { ProcessingView } from './views/Processing'
 import { ResultView } from './views/Result'
 import { ScanningView } from './views/Scanning'
 import { SettingsView } from './views/Settings'
+import { loadPrefs } from './views/Settings/prefs'
 
 const App = () => {
   const view = useAppStore((s) => s.view)
+  const { setMode } = useColorScheme()
 
-  // 启动加载后端配置
+  // 启动加载后端配置 + 恢复持久化的主题偏好
   useEffect(() => {
-    void useAppStore.getState().loadSettings()
-  }, [])
+    void useAppStore.getState().loadSettings().then(() => {
+      void useAppStore.getState().restoreLastFolder()
+    })
+    const { theme } = loadPrefs()
+    if (theme && theme !== 'system' && setMode) {
+      setMode(theme)
+    }
+  }, [setMode])
 
   // 全局键盘快捷键（Esc/Ctrl+,/Ctrl+O/Ctrl+L/F1/Space/Enter）
   useEffect(() => {
