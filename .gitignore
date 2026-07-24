@@ -40,4 +40,8 @@ dist/
 # Tauri 生成
 backend/gen/
 
+# cargo tauri icon 生成的移动端图标（本项目仅 Windows/Linux，不做移动端）
+backend/icons/android/
+backend/icons/ios/
+
 *.code-workspace
