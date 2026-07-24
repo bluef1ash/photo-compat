@@ -31,10 +31,11 @@ pub fn run() {
             let config = Config::load(&data_dir);
 
             let log_dir = data_dir.join("logs");
-            let _guard = log::init(log_dir, &config.log_level);
+            let (_guard, reload_fn) = log::init(log_dir.clone(), &config.log_level);
+            log::cleanup_old_logs(&log_dir, config.log_retention_days);
             app.manage(_guard); // 保活
 
-            app.manage(AppState::new(config));
+            app.manage(AppState::new(config, reload_fn));
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

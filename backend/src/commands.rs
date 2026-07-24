@@ -98,6 +98,8 @@ pub async fn save_settings_cmd(
         let mut cfg = state.config.lock().unwrap();
         *cfg = config.clone();
     }
+    // 运行时重载日志级别（reload EnvFilter，无需重启 app）
+    (state.reload_log_level)(&config.log_level);
     if let Some(dir) = app.path().app_data_dir().ok() {
         config.save(&dir);
     }

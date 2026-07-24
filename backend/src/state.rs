@@ -1,5 +1,6 @@
 // src-tauri/src/state.rs
 use crate::config::Config;
+use crate::log::LogLevelReloader;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
@@ -13,13 +14,15 @@ pub struct JobHandle {
 pub struct AppState {
     pub config: Mutex<Config>,
     pub job: Mutex<Option<JobHandle>>,
+    pub reload_log_level: LogLevelReloader,
 }
 
 impl AppState {
-    pub fn new(config: Config) -> Self {
+    pub fn new(config: Config, reload_log_level: LogLevelReloader) -> Self {
         Self {
             config: Mutex::new(config),
             job: Mutex::new(None),
+            reload_log_level,
         }
     }
 
