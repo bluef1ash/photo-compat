@@ -34,6 +34,18 @@ walkdir = "2"
 opener = "0.7"
 tokio = "1"
 chrono = "0.4"
+jpeg-encoder = "0.7.0"
+lcms2 = { version = "6.1.1", features = ["static"] }
+libheif-rs = { version = "2.7", optional = true, features = ["embedded-libheif", "image"] }
 
 [dev-dependencies]
 tempfile = "3"
+
+[features]
+# HEIC/HEIF 解码：启用后引入 libheif（embedded-libheif 从源码编译）。
+# 默认关闭（opt-in）：HEIC 需要较重的原生依赖，默认构建不含以保证三端开箱即用。
+# - Linux 构建需 cmake + C++ 编译器（详见 README「编译依赖」）。
+# - Windows(MSVC) 构建需 vcpkg 提供 libheif（见 libheif-sys 文档）。
+# 关闭本特性则 HEIC 文件按「不支持」跳过，其余功能不受影响。
+default = []
+heic = ["dep:libheif-rs"]
