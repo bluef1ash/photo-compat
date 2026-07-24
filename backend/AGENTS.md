@@ -39,6 +39,12 @@ src/
 - 7 变体:`DirAccess` / `Permission` / `DiskFull` / `Corrupt` / `Unsupported` / `Io` / `Internal`
 - `From<io::Error>` 按 `ErrorKind` 分流;`#[serde(tag = "kind", content = "message")]` 给前端路由四段弹窗
 - 失败**不中断主流程**(§15.7);`Unsupported`→跳过计数(§10.13 HEIC MVP 跳过)
+- **HEIC**:由 cargo `heic` 特性门控（默认关）。启用 `--features heic` 后经 libheif 的 `image` 解码钩子复用本管线；未启用或 `convert_heic=false` 时按 `Unsupported` 跳过。
+
+## 原生依赖(编译期)
+
+- **lcms2**(始终启用,`to_srgb` 色彩转换):`lcms2-sys` `static` 特性用 `cc` 从源码静态编译,仅需 C 编译器,无系统库要求。
+- **libheif**(可选 `heic` 特性):`embedded-libheif` 从内置源码用 **cmake** 编译。Linux 需 `cmake`+`g++`(首次联网拉 libde265/aom);Windows(MSVC) 走 vcpkg。详见根 README「编译依赖」。
 
 ## 并发
 

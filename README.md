@@ -46,6 +46,34 @@ cd backend && cargo test --lib        # 后端
 cd frontend && pnpm test              # 前端（vitest）
 ```
 
+## 编译依赖（原生库）
+
+部分图像处理能力依赖原生 C/C++ 库，由 Rust 构建脚本自动拉取编译，**无需手动安装系统库**，但需要对应的编译工具链。
+
+### 色彩转换（lcms2，始终启用）
+
+`to_srgb` 色彩空间转换依赖 [lcms2](https://crates.io/crates/lcms2)，其 `static` 特性用 `cc` crate 从源码静态编译。仅需一个 **C 编译器**（Windows 自带 MSVC、Linux 用 gcc/clang），无任何系统包要求，三端（含信创龙芯/飞腾）开箱即用。
+
+### HEIC 转换（libheif，可选 `heic` 特性）
+
+HEIC/HEIF 解码依赖 [libheif](https://github.com/niclaslindberg/libheif-rs)，**默认不启用**，以保证默认构建在三端都能直接编译。启用方式：
+
+```bash
+cd backend && cargo tauri dev --features heic      # 开发
+cd backend && cargo tauri build --features heic    # 发布
+```
+
+`heic` 特性开启 `embedded-libheif`：从 `libheif-sys` 内置源码用 **cmake** 编译 libheif，并把编解码器（libde265 解 HEVC、aom 等）作为子项目一并编译。
+
+| 平台                                       | 编译要求                      | 安装/准备                                                                                                      |
+| ------------------------------------------ | ----------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Linux**（含信创 UOS/麒麟/deepin/Ubuntu） | `cmake` + C++ 编译器（C++17） | Debian 系：`sudo apt-get install -y cmake g++`；Fedora/RHEL：`sudo dnf install -y cmake gcc-c++`               |
+| **Windows (MSVC)**                         | 走 vcpkg 安装 libheif         | 在 `backend/` 下 `cargo install cargo-vcpkg && cargo vcpkg build`（首次联网下载并编译 vcpkg 版 libheif，较慢） |
+
+> ⚠️ **Linux 首次编译需联网**：libheif 的 cmake 会用 `FetchContent` 拉取 libde265/aom 等编解码器源码再本地编译，首次耗时约 10–20 分钟（之后有缓存）。**离线/信创内网环境**若无法联网，可改用系统包：`sudo apt-get install -y libheif-dev`（≥1.17，会自动带上 libde265/libaom），但当前 `heic` 特性固定走 `embedded-libheif`，如需对接系统 libheif 请单独评估。
+>
+> 未启用 `heic` 特性时，HEIC/HEIF 文件会按「不支持」诚实跳过，其余格式（含色彩转换）功能不受影响。
+
 ## 约束
 
 详见 [AGENTS.md](AGENTS.md)、[backend/AGENTS.md](backend/AGENTS.md)、[frontend/AGENTS.md](frontend/AGENTS.md)。
