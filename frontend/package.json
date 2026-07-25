@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "pnpm run precommit && vite build",
+    "build:release": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest run",
