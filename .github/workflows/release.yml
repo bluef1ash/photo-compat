@@ -63,12 +63,13 @@ jobs:
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 11
+          version: 11.13.0
 
       - name: 安装 Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # pnpm 11 要求 Node.js >=22.13（依赖 node:sqlite 内置模块），不可降回 20
+          node-version: '22'
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
