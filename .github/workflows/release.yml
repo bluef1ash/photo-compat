@@ -102,6 +102,6 @@ jobs:
             - Windows：.msi 安装包 / .exe（NSIS）
             - Linux：.deb 安装包 / .AppImage 免安装
             - macOS：.dmg / .app
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
