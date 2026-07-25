@@ -1,2 +1,4 @@
+# 允许 esbuild 执行 install 期构建脚本
+# 注意：pnpm v11 起用 allowBuilds（对象形式）取代旧版 onlyBuiltDependencies（数组形式），此为 v11 格式
 allowBuilds:
   esbuild: true
