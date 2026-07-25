@@ -58,7 +58,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
+          # xdg-utils 提供 /usr/bin/xdg-open，Tauri 打包 AppImage 时硬性要求；ARM runner 镜像未预装
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev xdg-utils
 
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
