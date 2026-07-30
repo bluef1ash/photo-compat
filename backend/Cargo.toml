@@ -15,12 +15,10 @@ name = "photo_compat_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["protocol-asset"] }
-tauri-plugin-opener = "2"
-tauri-plugin-dialog = "2"
+tauri = { version = "1", features = ["protocol-asset", "dialog-open", "path-all", "window-minimize", "window-maximize", "window-unmaximize", "window-close", "window-start-dragging"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 image = "0.25"
@@ -49,3 +47,6 @@ tempfile = "3"
 # 关闭本特性则 HEIC 文件按「不支持」跳过，其余功能不受影响。
 default = []
 heic = ["dep:libheif-rs"]
+# 生产构建资源加载：tauri build 传 --features custom-protocol，
+# 转发给 tauri crate 使 generate_context! 从打包资源而非 devUrl 加载前端
+custom-protocol = ["tauri/custom-protocol"]

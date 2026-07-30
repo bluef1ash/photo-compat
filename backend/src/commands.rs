@@ -7,7 +7,7 @@ use crate::types::{ProcessSummary, ScanResult};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
-use tauri::{AppHandle, Emitter, Manager, State};
+use tauri::{AppHandle, Manager, State};
 
 #[tauri::command]
 pub async fn scan_directory_cmd(
@@ -55,7 +55,7 @@ pub async fn start_process_cmd(
         if let Some(app_state) = app.try_state::<AppState>() {
             app_state.clear_job();
         }
-        let _ = app.emit("process://summary", summary);
+        let _ = app.emit_all("process://summary", summary);
     });
 
     Ok(())
@@ -100,7 +100,7 @@ pub async fn save_settings_cmd(
     }
     // 运行时重载日志级别（reload EnvFilter，无需重启 app）
     (state.reload_log_level)(&config.log_level);
-    if let Some(dir) = app.path().app_data_dir().ok() {
+    if let Some(dir) = tauri::api::path::app_data_dir(&app.config()) {
         config.save(&dir);
     }
     Ok(())
@@ -109,10 +109,8 @@ pub async fn save_settings_cmd(
 /// 在系统资源管理器/默认编辑器中打开最新日志文件（无则打开 logs 目录）
 #[tauri::command]
 pub async fn open_log_cmd(app: AppHandle) -> Result<(), String> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?
+    let dir = tauri::api::path::app_data_dir(&app.config())
+        .ok_or("无法获取 app_data_dir".to_string())?
         .join("logs");
     let target = latest_log_file(&dir).unwrap_or_else(|| dir.to_string_lossy().to_string());
     opener::open(&target).map_err(|e| e.to_string())
@@ -121,10 +119,8 @@ pub async fn open_log_cmd(app: AppHandle) -> Result<(), String> {
 /// 返回最新日志文件路径（供前端 toast 展示）；无则返回 logs 目录
 #[tauri::command]
 pub async fn export_log_cmd(app: AppHandle) -> Result<String, String> {
-    let dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?
+    let dir = tauri::api::path::app_data_dir(&app.config())
+        .ok_or("无法获取 app_data_dir".to_string())?
         .join("logs");
     Ok(latest_log_file(&dir).unwrap_or_else(|| dir.to_string_lossy().to_string()))
 }

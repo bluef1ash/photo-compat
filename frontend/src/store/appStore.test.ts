@@ -15,7 +15,7 @@ vi.mock('../ipc/commands', () => ({
 }))
 
 // mock Tauri dialog API
-vi.mock('@tauri-apps/plugin-dialog', () => ({
+vi.mock('@tauri-apps/api/dialog', () => ({
   open: vi.fn(),
 }))
 
@@ -53,7 +53,7 @@ describe('appStore 状态机', () => {
   it('空目录回 home 且显示错误（§15.1）', async () => {
     const { useAppStore } = await import('./appStore')
     const { scanDirectory } = await import('../ipc/commands')
-    const { open } = await import('@tauri-apps/plugin-dialog')
+    const { open } = await import('@tauri-apps/api/dialog')
 
     // mock dialog 返回路径
     vi.mocked(open).mockResolvedValue('/test/path')

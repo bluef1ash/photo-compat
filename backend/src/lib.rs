@@ -17,16 +17,11 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             // 配置优先：先加载（拿 log_level），再据此初始化日志
-            let data_dir = app
-                .path()
-                .app_data_dir()
+            let data_dir = tauri::api::path::app_data_dir(&app.config())
                 .expect("无法获取 app_data_dir 目录");
             let config = Config::load(&data_dir);
 

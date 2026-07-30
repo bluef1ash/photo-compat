@@ -13,7 +13,7 @@ vi.mock('../../ipc/commands', () => ({
   resumeProcess: vi.fn(),
   openOutput: vi.fn(),
 }))
-vi.mock('@tauri-apps/plugin-dialog', () => ({ open: vi.fn() }))
+vi.mock('@tauri-apps/api/dialog', () => ({ open: vi.fn() }))
 vi.mock('@tauri-apps/api/event', () => ({ listen: vi.fn(() => Promise.resolve(() => {})) }))
 vi.mock('@tauri-apps/api/path', () => ({
   join: vi.fn(async (a: string, b: string) => `${a}/${b}`),

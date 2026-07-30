@@ -3,11 +3,14 @@
 # 覆盖目标（均原生构建，避免交叉编译 webkit2gtk 的依赖地狱）：
 #   Windows x86_64 / aarch64   Linux x86_64 / aarch64   macOS x86_64 / aarch64
 #
+# Linux 兼容性策略（2026-07）：
+# - Linux 在 ubuntu:20.04(focal) 容器内编译，glibc 2.31，兼容麒麟 V10 SP1 等信创老系统。
+# - 框架为 Tauri 1.x，Linux 依赖 webkit2gtk-4.0（focal/麒麟源原生提供），非 4.1。
+# - focal 容器在 ubuntu-22.04(-arm) runner 上运行；ARM runner 拉取 aarch64 版 focal 镜像。
+#
 # 说明：
-# - windows-11-arm、ubuntu-22.04-arm 为 GitHub 托管 ARM runner，public 仓库免费可用；
-#   私有仓库若不可用，把对应行的 os 改回 windows-latest / ubuntu-22.04 并自行配置交叉工具链。
-# - 产物随 tauri.conf.json 的 bundle.targets=all 生成：Windows .msi/.exe、Linux .deb/.AppImage、macOS .dmg/.app。
-# - 发布为 draft，需手动核对后发布。
+# - windows-11-arm、ubuntu-22.04-arm 为 GitHub 托管 ARM runner。
+# - 产物随 tauri.conf.json 的 bundle.targets=all 生成。
 
 name: Release
 
@@ -26,6 +29,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Windows + macOS：宿主 runner 原生构建
   build:
     strategy:
       fail-fast: false
@@ -37,12 +41,7 @@ jobs:
           - os: windows-11-arm
             target: aarch64-pc-windows-msvc
             label: windows-aarch64
-          - os: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
-            label: linux-x86_64
-          - os: ubuntu-22.04-arm
-            target: aarch64-unknown-linux-gnu
-            label: linux-aarch64
+            bundleArgs: "--bundles nsis"
           # macos-13 已退役（2026年仅留 macos-15/26），x64 改用 macos-15-intel 原生构建
           - os: macos-15-intel
             target: x86_64-apple-darwin
@@ -53,14 +52,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
-      # Linux（含 ARM runner）需 webkit2gtk 等系统依赖
-      - name: 安装 Linux 系统依赖
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          # xdg-utils 提供 /usr/bin/xdg-open，Tauri 打包 AppImage 时硬性要求；ARM runner 镜像未预装
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev xdg-utils
 
       - name: 安装 pnpm
         uses: pnpm/action-setup@v4
@@ -79,6 +70,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
+          components: rustfmt
 
       - name: 缓存 Cargo
         uses: swatinem/rust-cache@v2
@@ -88,6 +80,59 @@ jobs:
       - name: 安装前端依赖
         run: pnpm install --frozen-lockfile
         working-directory: frontend
+
+      - name: 注入版本号（跟随 tag）
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart('v')
+          Write-Host "注入版本号: $ver"
+          # tauri.conf.json
+          $conf = Get-Content backend/tauri.conf.json -Raw | ConvertFrom-Json
+          $conf.package.version = $ver
+          $conf | ConvertTo-Json -Depth 30 | Set-Content backend/tauri.conf.json -Encoding UTF8
+          # Cargo.toml（仅替换 [package] 段的 version，行首匹配，依赖版本不受影响）
+          $cargo = Get-Content backend/Cargo.toml -Raw
+          $cargo = ([regex]'(?m)^version = ".*"').Replace($cargo, "version = `"$ver`"", 1)
+          Set-Content backend/Cargo.toml -Value $cargo -Encoding UTF8
+          # package.json
+          $pkg = Get-Content frontend/package.json -Raw | ConvertFrom-Json
+          $pkg.version = $ver
+          $pkg | ConvertTo-Json -Depth 30 | Set-Content frontend/package.json -Encoding UTF8
+      # 仅 windows-aarch64：windows-11-arm 上 @tauri-apps/cli 的 tauri-bundler 依赖 ureq 但缺 TLS 后端，
+      # 所有 HTTPS 下载（WiX/NSIS/WebView2）均报 Unknown Scheme。
+      # 改用系统 PowerShell（自带 TLS）把工具预置到 %LOCALAPPDATA%\tauri，bundler 检测到文件存在即跳过下载。
+      - name: 预置 Tauri 打包工具（NSIS + WebView2）
+        if: matrix.label == 'windows-aarch64'
+        shell: pwsh
+        run: |
+          $tools = Join-Path $env:LOCALAPPDATA 'tauri'
+          New-Item -ItemType Directory -Force -Path $tools | Out-Null
+
+          # NSIS 工具集：tauri-bundler 期望解压后根目录 nsis-3.08，重命名为 NSIS
+          $zip = Join-Path $env:TEMP 'nsis-3.zip'
+          Invoke-WebRequest -Uri 'https://github.com/tauri-apps/binary-releases/releases/download/nsis-3/nsis-3.zip' -OutFile $zip
+          $tmp = Join-Path $env:TEMP 'nsis-extract'
+          Expand-Archive -Path $zip -DestinationPath $tmp -Force
+          $nsis = Join-Path $tools 'NSIS'
+          if (Test-Path $nsis) { Remove-Item -Recurse -Force $nsis }
+          Move-Item (Join-Path $tmp 'nsis-3.08') $nsis
+
+          # NSIS Tauri 插件（SHA1 与 bundler 内置校验值一致）
+          $plug = Join-Path $nsis 'Plugins\x86-unicode'
+          New-Item -ItemType Directory -Force -Path $plug | Out-Null
+          Invoke-WebRequest -Uri 'https://github.com/tauri-apps/nsis-tauri-utils/releases/download/nsis_tauri_utils-v0.4.1/nsis_tauri_utils.dll' -OutFile (Join-Path $plug 'nsis_tauri_utils.dll')
+
+          # WebView2 引导程序（DownloadBootstrapper 模式，文件存在即跳过下载）
+          Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/p/?LinkId=2124703' -OutFile (Join-Path $tools 'MicrosoftEdgeWebview2Setup.exe')
+
+      # WiX3 不支持 ARM64 目标，且其下载会因 TLS 缺失失败；锁定 bundle.targets 为 nsis 从源头跳过 MSI 路径
+      - name: 锁定 NSIS 打包目标（跳过 MSI/WiX）
+        if: matrix.label == 'windows-aarch64'
+        shell: pwsh
+        run: |
+          $conf = 'backend/tauri.conf.json'
+          (Get-Content $conf -Raw) -replace '"targets":\s*"all"', '"targets": ["nsis"]' |
+            Set-Content $conf -NoNewline
 
       - name: 构建并发布（tauri-action）
         uses: tauri-apps/tauri-action@v0
@@ -104,4 +149,89 @@ jobs:
             - macOS：.dmg / .app
           releaseDraft: false
           prerelease: false
-          args: --target ${{ matrix.target }}
+          args: --target ${{ matrix.target }} ${{ matrix.bundleArgs || '' }}
+
+  # Linux：focal 容器内编译（glibc 2.31 + webkit2gtk-4.0），兼容麒麟 V10 SP1
+  build-linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            label: linux-x86_64
+          - os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            label: linux-aarch64
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ubuntu:20.04
+      env:
+        DEBIAN_FRONTEND: noninteractive
+        TZ: UTC
+    steps:
+      # 容器为裸 focal 镜像（无 sudo/git/curl），先装齐基础工具 + Tauri Linux 系统依赖
+      - name: 安装 focal 系统依赖
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates curl git pkg-config build-essential \
+            libwebkit2gtk-4.0-dev libgtk-3-dev librsvg2-dev \
+            patchelf libssl-dev xdg-utils libappindicator3-dev
+
+      - uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: 安装 Rust 工具链（含目标架构）
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: 缓存 Cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+
+      - name: 安装前端依赖
+        run: pnpm install --frozen-lockfile
+        working-directory: frontend
+
+      - name: 注入版本号（跟随 tag）
+        shell: bash
+        run: |
+          ver="${{ github.ref_name }}"
+          ver="${ver#v}"
+          echo "注入版本号: $ver"
+          # tauri.conf.json（node 保证 JSON 结构完整）
+          node -e "const fs=require('fs');const f=process.argv[1];const j=JSON.parse(fs.readFileSync(f,'utf8'));j.package.version=process.argv[2];fs.writeFileSync(f,JSON.stringify(j,null,2)+'\n')" backend/tauri.conf.json "$ver"
+          # package.json
+          node -e "const fs=require('fs');const f=process.argv[1];const j=JSON.parse(fs.readFileSync(f,'utf8'));j.version=process.argv[2];fs.writeFileSync(f,JSON.stringify(j,null,2)+'\n')" frontend/package.json "$ver"
+          # Cargo.toml（仅替换 [package] 段首个行首 version，依赖版本不受影响）
+          sed -i "0,/^version = \".*\"/s//version = \"$ver\"/" backend/Cargo.toml
+      - name: 构建并发布（tauri-action）
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: backend
+          tagName: ${{ github.ref_name }}
+          releaseName: '照片适配助手 ${{ github.ref_name }}'
+          releaseBody: |
+            多平台发行版（本次构建目标：${{ matrix.label }}）。
+            - Windows：.msi 安装包 / .exe（NSIS）
+            - Linux：.deb 安装包 / .AppImage 免安装
+            - macOS：.dmg / .app
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }} --bundles deb,rpm

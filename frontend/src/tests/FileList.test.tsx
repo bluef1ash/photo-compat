@@ -1,4 +1,4 @@
-import { convertFileSrc } from '@tauri-apps/api/core'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithTheme } from '../test-utils'
@@ -6,7 +6,7 @@ import type { FileMeta } from '../types'
 import { FileList } from '../components/FileList'
 
 // convertFileSrc 在真实环境依赖 window.__TAURI_INTERNALS__，这里整体 mock 拦截
-vi.mock('@tauri-apps/api/core', () => ({
+vi.mock('@tauri-apps/api/tauri', () => ({
   convertFileSrc: vi.fn(),
 }))
 

@@ -11,7 +11,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use walkdir::WalkDir;
 
-// 编译期验证 AppHandle 线程安全（Tauri 2 AppHandle: Send+Sync，par_iter 并发 emit 安全）
+// 编译期验证 AppHandle 线程安全（AppHandle: Send+Sync，par_iter 并发 emit 安全）
 const _: () = {
     fn _assert_send_sync<T: Send + Sync>() {}
     fn _check() {
@@ -234,7 +234,7 @@ pub fn run_pipeline(
     cancel: &Arc<AtomicBool>,
     paused: &Arc<AtomicBool>,
 ) -> ProcessSummary {
-    use tauri::Emitter;
+    use tauri::Manager;
     run_pipeline_internal(
         files,
         source_root,
@@ -244,10 +244,10 @@ pub fn run_pipeline(
         cancel,
         paused,
         |handle, evt| {
-            let _ = handle.emit("process://progress", evt);
+            let _ = handle.emit_all("process://progress", evt);
         },
         |handle, log| {
-            let _ = handle.emit("process://log", log);
+            let _ = handle.emit_all("process://log", log);
         },
     )
 }

@@ -220,9 +220,9 @@ pub fn scan_directory_with_app(
     root: &Path,
     app: Option<tauri::AppHandle>,
 ) -> AppResult<ScanResult> {
-    use tauri::Emitter;
+    use tauri::Manager;
     scan_directory_internal(root, &app, |handle, p| {
-        let _ = handle.emit("scan://progress", p);
+        let _ = handle.emit_all("scan://progress", p);
     })
 }
 

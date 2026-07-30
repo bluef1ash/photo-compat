@@ -1,0 +1,8 @@
+[Desktop Entry]
+Categories={{categories}}
+Comment=批量兼容化照片 EXIF，适配老旧政务、医疗、教育系统上传
+Exec={{exec}}
+Icon={{icon}}
+Name=照片适配助手
+Terminal=false
+Type=Application

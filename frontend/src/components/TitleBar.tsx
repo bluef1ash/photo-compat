@@ -3,7 +3,7 @@ import CropSquareIcon from '@mui/icons-material/CropSquare'
 import MinimizeIcon from '@mui/icons-material/Minimize'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { Box, IconButton } from '@mui/material'
-import { getCurrentWindow } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/window'
 import type React from 'react'
 import { useAppStore } from '../store/appStore'
 
@@ -45,13 +45,13 @@ export const TitleBar: React.FC = () => {
   const openSettings = useAppStore((s) => s.openSettings)
 
   const onMinimize = () => {
-    void getCurrentWindow().minimize()
+    void getCurrent().minimize()
   }
   const onToggleMax = () => {
-    void getCurrentWindow().toggleMaximize()
+    void getCurrent().toggleMaximize()
   }
   const onClose = () => {
-    void getCurrentWindow().close()
+    void getCurrent().close()
   }
 
   return (

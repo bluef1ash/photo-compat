@@ -1,4 +1,4 @@
-import { convertFileSrc } from '@tauri-apps/api/core'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useMemo, useRef, useState } from 'react'
 
 /**

@@ -1,6 +1,6 @@
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 import { join } from '@tauri-apps/api/path'
-import { open } from '@tauri-apps/plugin-dialog'
+import { open } from '@tauri-apps/api/dialog'
 import { create } from 'zustand'
 import * as cmd from '../ipc/commands'
 import type {
