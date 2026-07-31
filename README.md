@@ -74,6 +74,12 @@ cd backend && cargo tauri build --features heic    # 发布
 >
 > 未启用 `heic` 特性时，HEIC/HEIF 文件会按「不支持」诚实跳过，其余格式（含色彩转换）功能不受影响。
 
+## 发布（GitHub Actions）
+
+推送 `v*` tag（如 `v0.2.0`）触发 `.github/workflows/release.yml` 多平台打包并发布 Release。版本号取自 tag（去掉 `v` 前缀）并同步进 `backend/tauri.conf.json`，安装包与 Release 资产文件名中的版本随之变化，无需手动改版本号；手动触发时沿用仓库当前版本。
+
+安装后的应用名与快捷方式为「照片适配助手」（`productName`），可执行文件名保持英文 `photo-compat`（`mainBinaryName`）；Release 资产上传名固定为英文 `photo-compat-<版本>-<平台>-<架构>-<类型>...`，避免中文文件名在旧下载/解压工具中出现编码问题。
+
 ## 约束
 
 详见 [AGENTS.md](AGENTS.md)、[backend/AGENTS.md](backend/AGENTS.md)、[frontend/AGENTS.md](frontend/AGENTS.md)。

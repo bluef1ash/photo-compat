@@ -7,6 +7,8 @@
 # - windows-11-arm、ubuntu-22.04-arm 为 GitHub 托管 ARM runner，public 仓库免费可用；
 #   私有仓库若不可用，把对应行的 os 改回 windows-latest / ubuntu-22.04 并自行配置交叉工具链。
 # - 产物随 tauri.conf.json 的 bundle.targets=all 生成：Windows .msi/.exe、Linux .deb/.AppImage、macOS .dmg/.app。
+# - 版本号跟随 tag（去掉 v 前缀）同步进 tauri.conf.json；手动触发时沿用仓库当前版本。
+# - 安装后的应用名/快捷方式为 productName「照片适配助手」，可执行文件与 Release 资产名保持英文 photo-compat。
 # - 发布为 draft，需手动核对后发布。
 
 name: Release
@@ -75,6 +77,21 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
+      # 从 tag 提取版本号并写入 Tauri 配置，保证安装包/文件名/包内版本与 tag 一致
+      - name: 同步 tag 版本到 Tauri 配置
+        shell: bash
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [[ "$REF_TYPE" == "tag" && "$REF_NAME" == v* ]]; then
+            VERSION="${REF_NAME#v}"
+          else
+            VERSION="0.1.0"
+          fi
+          node -e "const fs=require('fs');const p='backend/tauri.conf.json';const c=JSON.parse(fs.readFileSync(p,'utf8'));c.version=process.argv[1];fs.writeFileSync(p,JSON.stringify(c,null,2)+'\n')" "$VERSION"
+          echo "已同步版本：$VERSION"
+
       - name: 安装 Rust 工具链（含目标架构）
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -99,9 +116,11 @@ jobs:
           releaseName: '照片适配助手 ${{ github.ref_name }}'
           releaseBody: |
             多平台发行版（本次构建目标：${{ matrix.label }}）。
-            - Windows：.msi 安装包 / .exe（NSIS）
+            - Windows：.exe 安装包（NSIS）
             - Linux：.deb 安装包 / .AppImage 免安装
             - macOS：.dmg / .app
           releaseDraft: false
           prerelease: false
-          args: --target ${{ matrix.target }}
+          # productName 为中文，上传 Release 的资产名固定为英文，避免下载/解压工具的编码兼容问题
+          assetNamePattern: photo-compat-[version]-[platform]-[arch]-[bundle][setup][ext]
+          args: --target ${{ matrix.target }}${{ runner.os == 'Windows' && ' --bundles nsis' || '' }}
