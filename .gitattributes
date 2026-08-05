@@ -7,6 +7,24 @@
 *.html linguist-language=HTML
 *.jsp linguist-language=Java
 *.java linguist-language=Java
+*.md linguist-language=Markdown
+*.php linguist-language=PHP
+*.py linguist-language=Python
+*.rb linguist-language=Ruby
+*.rs linguist-language=Rust
+*.swift linguist-language=Swift
+*.go linguist-language=Golang
+*.c linguist-language=C
+*.cpp linguist-language=C++
+*.h linguist-language=C
+*.hpp linguist-language=C++
+*.m linguist-language=Objective-C
+*.mm linguist-language=Objective-C++
+*.swift linguist-language=Swift
+*.lua linguist-language=Lua
+*.dart linguist-language=Dart
+*.kts linguist-language=Kotlin
+*.rs linguist-language=Rust
 
 # Handle line endings automatically for files detected as text and leave all files detected as binary untouched.
 * text eol=lf
@@ -37,6 +55,23 @@
 *.tsx           text
 *.jsx           text
 *.vue           text
+*.md            text
+*.php           text
+*.py            text
+*.rb            text
+*.rs            text
+*.swift         text
+*.go            text
+*.c             text
+*.cpp           text
+*.h             text
+*.hpp           text
+*.m             text
+*.mm            text
+*.lua           text
+*.dart          text
+*.kts           text
+*.rs            text
 
 # These files are binary and should be left untouched
 # (binary is a macro for -text -diff)
@@ -52,3 +87,14 @@
 *.png           binary
 *.so            binary
 *.war           binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.eot           binary
+*.pdf           binary
+*.exe           binary
+*.apk           binary
+*.ipa           binary
+*.aab           binary
+*.aabx          binary
+*.aabz          binary
